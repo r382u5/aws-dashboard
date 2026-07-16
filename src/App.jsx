@@ -14,6 +14,7 @@ import { getFirestore, doc, setDoc, onSnapshot } from 'firebase/firestore';
 // プレビュー環境では自動的に提供されます。個人のAPIキーを設定画面から入力できます。
 const fallbackApiKey = ""; 
 const isCanvasEnv = typeof __app_id !== 'undefined';
+// AIモデルの設定：個人のAPIキーを使う場合は安定版のモデルを使用します
 const getModelText = (key) => key ? "gemini-3.1-flash-lite" : "gemini-2.5-flash-preview-09-2025";
 
 // --- Firebase Init ---
@@ -279,7 +280,7 @@ const initialStats = {
     // AIチューターの会話履歴を保存するための初期ステートを追加
     tutorHistory: {
         guide: [
-            { role: 'model', text: 'こんにちは！AWS認定クラウドプラクティショナー(CLF-C02)のガイドAIです。\n一緒にロードマップに沿って学習を進めていきましょう！\n\nまずは「レベル1: クラウドの全体像とコンセプト」から始めますか？準備ができたら「始める」と教えてください。' }
+            { role: 'model', text: 'こんにちは！AWS認定クラウドプラクティショナー(CLF-C02)のガイドAIです。\n\nまずは「レベル1: クラウドの全体像とコンセプト」から始めますか？準備ができたら「始める」と教えてください。' }
         ],
         qna: [
             { role: 'model', text: 'こんにちは！AIチューターです。\n試験範囲でわからない用語や、サービス同士の違いなどがあれば、何でも自由に質問してください。' }
@@ -1056,7 +1057,6 @@ function QuizView({ quizPool, setQuizPool, usedQuizIds, setUsedQuizIds, stats, u
 
 【選択肢（ディストラクター）の作成ルール】
 - 架空のサービス名は絶対に作成せず、すべて実在するAWSの公式サービス名（Amazon 〜, AWS 〜）を使用すること。
-- 上級問題のみ正解と目的が似ているサービス（例：S3とEBS、RDSとDynamoDB、WAFとShieldなど）を意図的に配置し、受験者が違いを正しく理解しているか問う構成にすること。」
 
 【解説（explanation）のルール】
 - 正解の理由だけでなく、**必ず「他のすべての不正解の選択肢がなぜ間違っているのか」の具体的な理由も含めて**詳しく記載してください。
@@ -1611,7 +1611,7 @@ function GuideView({ textClasses }) {
             <h2 className={`font-bold mb-6 flex items-center ${textClasses.title}`}>
                 <FileText className="mr-2 text-blue-600 dark:text-blue-400" /> 試験ガイド (要約)
             </h2>
-            <div className="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 prose dark:prose-invert max-w-none prose-blue transition-colors">
+            <div className="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-2xl shadow-lg dark:shadow-sm border border-white dark:border-gray-700 prose dark:prose-invert max-w-none prose-blue transition-colors">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b dark:border-gray-700 pb-2 mb-4">
                     <h3 className={`text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider mb-2 sm:mb-0 ${textClasses.lg}`}>
                         1. 試験の概要（AWS認定クラウドプラクティショナー）
@@ -1739,7 +1739,7 @@ function RoadmapView({ stats, updateStats, textClasses }) {
                     const isWeekComplete = week.tasks.every(task => stats.roadmapProgress?.includes(task.id));
                     
                     return (
-                        <div key={week.id} className={`bg-white dark:bg-gray-800 rounded-2xl shadow-sm border transition-colors ${isWeekComplete ? 'border-green-200 dark:border-green-800/50 bg-green-50/30 dark:bg-green-900/10' : 'border-gray-100 dark:border-gray-700'}`}>
+                        <div key={week.id} className={`bg-white dark:bg-gray-800 rounded-2xl shadow-lg dark:shadow-sm border transition-colors ${isWeekComplete ? 'border-green-200 dark:border-green-800/50 bg-green-50/30 dark:bg-green-900/10' : 'border-white dark:border-gray-700'}`}>
                             <div className="p-5 md:p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
                                 <h3 className={`font-bold text-gray-800 dark:text-gray-100 flex items-center ${textClasses.lg}`}>
                                     {isWeekComplete && <CheckCircle className="w-5 h-5 text-green-500 mr-2" />}
