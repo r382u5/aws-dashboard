@@ -14,7 +14,7 @@ import { getFirestore, doc, setDoc, onSnapshot } from 'firebase/firestore';
 // プレビュー環境では自動的に提供されます。個人のAPIキーを設定画面から入力できます。
 const fallbackApiKey = ""; 
 const isCanvasEnv = typeof __app_id !== 'undefined';
-const getModelText = (key) => key ? "gemini-2.5-flash" : "gemini-2.5-flash-preview-09-2025";
+const getModelText = (key) => key ? "gemini-3.5-flash" : "gemini-2.5-flash-preview-09-2025";
 
 // --- Firebase Init ---
 let app, auth, db, appId;
@@ -1088,7 +1088,7 @@ ${taskInstruction}
                 }
             };
 
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/${getModelText(apiKey)}:generateContent?key=${apiKey}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/interactions/${getModelText(apiKey)}:generateContent?key=${apiKey}`;
             const result = await fetchWithRetry(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
             const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
             if (!text) throw new Error("Empty response");
