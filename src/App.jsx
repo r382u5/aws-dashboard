@@ -14,7 +14,7 @@ import { getFirestore, doc, setDoc, onSnapshot } from 'firebase/firestore';
 // プレビュー環境では自動的に提供されます。個人のAPIキーを設定画面から入力できます。
 const fallbackApiKey = ""; 
 const isCanvasEnv = typeof __app_id !== 'undefined';
-const getModelText = (key) => key ? "gemini-2.5-flash" : "gemini-2.5-flash-preview-09-2025";
+const getModelText = (key) => key ? "gemini-1.5-flash";
 
 // --- Firebase Init ---
 let app, auth, db, appId;
