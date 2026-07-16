@@ -4,13 +4,16 @@ import {
     Loader2, ChevronRight, ChevronLeft, RefreshCw, Plus, CheckCircle, 
     XCircle, AlertCircle, BarChart3, MessageSquare, Calendar, Settings,
     Sun, Moon, Map, CheckSquare, Square, PlayCircle, Cloud,
-    Info, ExternalLink, Key, Trash2, User, Bot, Sparkles, Clock
+    Info, ExternalLink, Key, Trash2, User, Bot, Sparkles, Clock,
+    Target, CalendarDays
 } from 'lucide-react';
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore, doc, setDoc, onSnapshot } from 'firebase/firestore';
 
 // --- Configuration ---
+const SHOW_ESTIMATED_SCORE = false; // 推定スコアの表示/非表示を切り替えるフラグ
+
 // プレビュー環境では自動的に提供されます。個人のAPIキーを設定画面から入力できます。
 const fallbackApiKey = ""; 
 const isCanvasEnv = typeof __app_id !== 'undefined';
@@ -288,6 +291,7 @@ const initialStats = {
     dailyStats: {},
     roadmapProgress: [],
     settings: { textSize: 'md', theme: 'dark' },
+    examDate: null, // 追加: 受験日の管理
     // AIチューターの会話履歴を保存するための初期ステートを追加
     tutorHistory: {
         guide: [
@@ -313,6 +317,17 @@ const formatStudyTimeStr = (totalSeconds) => {
     return { value: m, unit: '分', full: `${m}分` };
 };
 
+// --- 追加: 残り日数の計算関数 ---
+const calculateDaysLeft = (examDateStr) => {
+    if (!examDateStr) return null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const exam = new Date(examDateStr);
+    exam.setHours(0, 0, 0, 0);
+    const diffTime = exam - today;
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+};
+
 // --- Main Application Component ---
 export default function App() {
     const [currentView, setCurrentView] = useState('dashboard');
@@ -330,6 +345,9 @@ export default function App() {
     
     // APIキーのState（初期値はlocalStorageから取得）
     const [userApiKey, setUserApiKey] = useState(() => localStorage.getItem('aws_clf_gemini_api_key') || '');
+    
+    // 追加: 受験日設定モーダルの表示状態
+    const [showExamModal, setShowExamModal] = useState(false);
 
     const handleApiKeyUpdate = (key) => {
         setUserApiKey(key);
@@ -338,6 +356,9 @@ export default function App() {
 
     // プレビュー環境のデフォルトキーか、ユーザーが入力したキーを使用
     const activeApiKey = fallbackApiKey || userApiKey;
+    
+    // 追加: 残り日数の計算
+    const daysLeft = calculateDaysLeft(stats.examDate);
 
     // Firebase Authentication
     useEffect(() => {
@@ -474,6 +495,8 @@ export default function App() {
 
     return (
         <div className={`flex h-screen overflow-hidden font-sans ${theme === 'dark' ? 'dark' : ''}`}>
+            {showExamModal && <ExamSettingsModal stats={stats} updateStats={updateStats} onClose={() => setShowExamModal(false)} textClasses={textClasses} />}
+            
             <div className="flex w-full h-full bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-300">
                 {/* Sidebar Navigation */}
                 <nav className="w-20 md:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col shrink-0 z-10 shadow-sm transition-colors duration-300">
@@ -491,11 +514,21 @@ export default function App() {
                     <NavItem icon={<MessageSquare />} label="AIチューター" active={currentView === 'tutor'} onClick={() => setCurrentView('tutor')} />
                     <NavItem icon={<FileText />} label="試験ガイド (要約)" active={currentView === 'guide'} onClick={() => setCurrentView('guide')} />
                 </div>
+                
+                {/* 追加: 試験日カウントダウンウィジェット */}
+                <div className="p-2 md:p-4 border-t border-gray-200 dark:border-gray-700 flex flex-col justify-end bg-gray-50/50 dark:bg-gray-800/50 transition-colors">
+                    <ExamCountdownWidget 
+                        stats={stats} 
+                        daysLeft={daysLeft} 
+                        onOpenModal={() => setShowExamModal(true)} 
+                        textClasses={textClasses} 
+                    />
+                </div>
             </nav>
 
             {/* Main Content Area */}
             <main className="flex-1 overflow-y-auto p-4 md:p-8">
-                {currentView === 'dashboard' && <DashboardView stats={stats} updateStats={updateStats} setUsedQuizIds={setUsedQuizIds} textClasses={textClasses} userApiKey={userApiKey} handleApiKeyUpdate={handleApiKeyUpdate} />}
+                {currentView === 'dashboard' && <DashboardView stats={stats} updateStats={updateStats} setUsedQuizIds={setUsedQuizIds} textClasses={textClasses} userApiKey={userApiKey} handleApiKeyUpdate={handleApiKeyUpdate} daysLeft={daysLeft} />}
                 {currentView === 'quiz' && (
                     <QuizView 
                         quizPool={quizPool} setQuizPool={setQuizPool}
@@ -509,6 +542,102 @@ export default function App() {
                 {currentView === 'tutor' && <TutorView stats={stats} updateStats={updateStats} textClasses={textClasses} apiKey={activeApiKey} />}
                 {currentView === 'guide' && <GuideView textClasses={textClasses} />}
             </main>
+            </div>
+        </div>
+    );
+}
+
+// --- 追加: Sidebar Widget (Exam Countdown) ---
+function ExamCountdownWidget({ stats, daysLeft, onOpenModal, textClasses }) {
+    if (daysLeft === null) {
+        return (
+            <div className="flex flex-col items-center justify-center text-center">
+                <button onClick={onOpenModal} className="w-full flex flex-col md:flex-row items-center justify-center p-3 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors border border-blue-200 dark:border-blue-800 border-dashed">
+                    <CalendarDays className="w-6 h-6 md:mr-2" />
+                    <span className={`hidden md:inline font-bold ${textClasses.sm}`}>試験日を設定</span>
+                </button>
+            </div>
+        );
+    }
+
+    if (daysLeft < 0) {
+        return (
+            <div onClick={onOpenModal} className="w-full flex flex-col items-center justify-center p-3 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                <span className={`font-bold ${textClasses.sm}`}>試験日を過ぎました</span>
+            </div>
+        );
+    }
+
+    let colorClass = "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800/50";
+    let iconColor = "text-blue-500 dark:text-blue-400";
+    if (daysLeft === 0) {
+        colorClass = "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800/50";
+        iconColor = "text-red-500 dark:text-red-400";
+    } else if (daysLeft <= 7) {
+        colorClass = "text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 border-amber-200 dark:border-amber-800/50";
+        iconColor = "text-amber-500 dark:text-amber-400";
+    }
+
+    return (
+        <div 
+            onClick={onOpenModal}
+            className={`w-full flex flex-col items-center justify-center p-2 md:p-3 rounded-xl border transition-colors cursor-pointer hover:opacity-80 ${colorClass}`}
+            title={`試験日: ${stats.examDate}`}
+        >
+            <Target className={`w-6 h-6 mb-1 ${iconColor}`} />
+            <div className="hidden md:flex flex-col items-center">
+                {daysLeft === 0 ? (
+                    <span className={`font-bold ${textClasses.lg}`}>本日 本番！</span>
+                ) : (
+                    <>
+                        <span className={`text-xs opacity-80 font-bold mb-0.5`}>試験まで あと</span>
+                        <span className={`font-black ${textClasses.xl} leading-none`}>{daysLeft}<span className="text-sm font-bold ml-0.5">日</span></span>
+                    </>
+                )}
+            </div>
+        </div>
+    );
+}
+
+// --- 追加: Exam Settings Modal ---
+function ExamSettingsModal({ stats, updateStats, onClose, textClasses }) {
+    const [dateStr, setDateStr] = useState(stats.examDate || '');
+
+    const handleSave = () => {
+        updateStats({ ...stats, examDate: dateStr || null });
+        onClose();
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-sm overflow-hidden border border-gray-100 dark:border-gray-700 flex flex-col">
+                <div className="p-5 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-900/50">
+                    <h3 className={`font-bold text-gray-800 dark:text-gray-100 flex items-center ${textClasses.lg}`}>
+                        <CalendarDays className="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400" /> 受験日の設定
+                    </h3>
+                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                        <XCircle className="w-6 h-6" />
+                    </button>
+                </div>
+                <div className="p-6">
+                    <p className={`text-gray-600 dark:text-gray-400 mb-4 ${textClasses.sm}`}>
+                        目標とする試験日を設定して、学習のモチベーションを高めましょう。（エフェクト等の機能は今後のアップデートで追加予定です）
+                    </p>
+                    <input 
+                        type="date" 
+                        value={dateStr}
+                        onChange={(e) => setDateStr(e.target.value)}
+                        className={`w-full p-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${textClasses.base}`}
+                    />
+                </div>
+                <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/50">
+                    <button onClick={() => { setDateStr(''); updateStats({...stats, examDate: null}); onClose(); }} className={`px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors font-medium ${textClasses.sm}`}>
+                        設定クリア
+                    </button>
+                    <button onClick={handleSave} className={`px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors shadow-sm ${textClasses.base}`}>
+                        保存する
+                    </button>
+                </div>
             </div>
         </div>
     );
@@ -531,7 +660,7 @@ function NavItem({ icon, label, active, onClick }) {
 }
 
 // --- Dashboard View ---
-function DashboardView({ stats, updateStats, setUsedQuizIds, textClasses, userApiKey, handleApiKeyUpdate }) {
+function DashboardView({ stats, updateStats, setUsedQuizIds, textClasses, userApiKey, handleApiKeyUpdate, daysLeft }) {
     const [showApiGuide, setShowApiGuide] = useState(false);
     
     const progressPercent = stats.totalAnswered > 0 ? (stats.correctAnswers / stats.totalAnswered) * 100 : 0;
@@ -539,6 +668,43 @@ function DashboardView({ stats, updateStats, setUsedQuizIds, textClasses, userAp
     const totalRoadmapTasks = 15; // 5 levels * 3 tasks
     const completedRoadmapTasks = stats.roadmapProgress?.length || 0;
     const roadmapPercent = (completedRoadmapTasks / totalRoadmapTasks) * 100;
+    const remainingTasks = totalRoadmapTasks - completedRoadmapTasks;
+
+    // --- 変更: 合格可能性メーター（独自のスコアリングロジック）の計算 ---
+    const TARGET_QUESTIONS = 400;
+    const TARGET_STUDY_SECONDS = 20 * 3600; // 20時間
+    
+    let estimatedScore = 0;
+    if (stats.totalAnswered > 0) {
+        // 全体の正答率
+        const overallAcc = stats.correctAnswers / stats.totalAnswered;
+        
+        // 分野別正答率（未回答の分野は全体正答率で補完）
+        const getDomainAcc = (domainName) => {
+            const dStat = stats.domainStats[domainName];
+            return (dStat && dStat.total > 0) ? (dStat.correct / dStat.total) : overallAcc;
+        };
+
+        const d1Acc = getDomainAcc("第1分野: クラウドのコンセプト");
+        const d2Acc = getDomainAcc("第2分野: セキュリティとコンプライアンス");
+        const d3Acc = getDomainAcc("第3分野: クラウドテクノロジーとサービス");
+        const d4Acc = getDomainAcc("第4分野: 請求、料金、サポート");
+
+        // AWS CLFの配点割合に基づく加重平均 (100% = 1.0)
+        const weightedAcc = (d1Acc * 0.24) + (d2Acc * 0.30) + (d3Acc * 0.34) + (d4Acc * 0.12);
+
+        // 独自のスコアリングロジック (最大1000点):
+        // ① 総合実力点 (最大350点): 総合正答率に基づく
+        // ② 分野別実力点 (最大350点): 分野別加重平均に基づく
+        // ③ 経験点 (最大150点): 目標問題数(400問)に対する達成率
+        // ④ 努力点 (最大150点): 目標学習時間(20時間)に対する達成率
+        const overallScore = overallAcc * 350;
+        const domainScore = weightedAcc * 350;
+        const qScore = Math.min(stats.totalAnswered / TARGET_QUESTIONS, 1.0) * 150;
+        const tScore = Math.min(stats.totalStudyTime / TARGET_STUDY_SECONDS, 1.0) * 150;
+
+        estimatedScore = Math.round(overallScore + domainScore + qScore + tScore);
+    }
 
     const resetStats = () => {
         if(window.confirm('学習データ（模擬テストの回答履歴、日別スコア、学習時間）をリセットしますか？')) {
@@ -603,6 +769,43 @@ function DashboardView({ stats, updateStats, setUsedQuizIds, textClasses, userAp
                     <p className={`font-bold text-green-600 dark:text-green-400 ${textClasses.super}`}>{stats.correctAnswers}<span className={`font-normal ml-1 ${textClasses.sm}`}>問</span></p>
                 </div>
             </div>
+
+            {/* --- 変更: 合格可能性メーター (フラグで表示制御) --- */}
+            {SHOW_ESTIMATED_SCORE && (
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mb-8 transition-colors">
+                    <h3 className={`font-bold flex items-center mb-6 text-gray-800 dark:text-gray-100 ${textClasses.xl}`}>
+                        <Brain className="mr-2 w-6 h-6 text-blue-600 dark:text-blue-400" /> 現在の推定スコア
+                    </h3>
+                    
+                    <div className="w-full flex flex-col items-center">
+                        <div className="flex justify-between items-end w-full mb-3">
+                            <div className="flex flex-col">
+                                <span className={`text-xs text-gray-400 dark:text-gray-500 mt-1`}>
+                                    ※総合及び分野別正答率・問題数・学習時間から算出
+                                </span>
+                            </div>
+                            <span className={`font-black ${stats.totalAnswered === 0 ? 'text-gray-400 dark:text-gray-500' : (estimatedScore >= 700 ? 'text-green-500 dark:text-green-400' : 'text-blue-600 dark:text-blue-400')} ${textClasses.super}`}>
+                                {stats.totalAnswered === 0 ? '-' : estimatedScore}<span className={`font-normal ml-1 ${textClasses.sm}`}>/1000点</span>
+                            </span>
+                        </div>
+                        
+                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-6 relative overflow-hidden">
+                            {/* 合格ラインのマーカー */}
+                            <div className="absolute top-0 bottom-0 left-[70%] w-1 bg-red-500 z-10 shadow-[0_0_5px_rgba(239,68,68,0.8)]" title="合格ライン (700点)"></div>
+                            <div 
+                                className={`h-6 rounded-full transition-all duration-1000 ease-out ${stats.totalAnswered === 0 ? 'bg-transparent' : (estimatedScore >= 700 ? 'bg-gradient-to-r from-green-400 to-green-500' : 'bg-gradient-to-r from-blue-400 to-blue-500')}`} 
+                                style={{ width: `${stats.totalAnswered === 0 ? 0 : Math.min(estimatedScore / 10, 100)}%` }}
+                            ></div>
+                        </div>
+                        
+                        <div className="w-full flex justify-between mt-2 px-1">
+                            <span className="text-xs text-gray-400 font-bold">0</span>
+                            <span className="text-xs text-red-500 font-bold ml-[35%] sm:ml-[45%]">合格ライン (700)</span>
+                            <span className="text-xs text-gray-400 font-bold">1000</span>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Roadmap Progress Widget */}
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-6 rounded-2xl shadow-sm border border-blue-100 dark:border-blue-800/50 mb-8 transition-colors">
@@ -991,6 +1194,11 @@ function QuizView({ quizPool, setQuizPool, usedQuizIds, setUsedQuizIds, stats, u
         const newStats = { ...stats };
         newStats.totalAnswered += 1;
         if (isCorrect) newStats.correctAnswers += 1;
+        
+        // 追加: 直近の回答結果を追加 (最大70件)
+        const newRecent = [...(newStats.recentResults || []), isCorrect];
+        if (newRecent.length > 70) newRecent.shift(); // 70を超えたら古いものを削除
+        newStats.recentResults = newRecent;
         
         // Domain
         let domainKey = currentQuiz.domain;
