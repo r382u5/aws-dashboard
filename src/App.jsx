@@ -1088,7 +1088,7 @@ ${taskInstruction}
                 }
             };
 
-            const url = `https://generativelanguage.googleapis.com/v1beta/interactions/${getModelText(apiKey)}:generateContent?key=${apiKey}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${getModelText(apiKey)}:generateContent?key=${apiKey}`;
             const result = await fetchWithRetry(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
             const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
             if (!text) throw new Error("Empty response");
