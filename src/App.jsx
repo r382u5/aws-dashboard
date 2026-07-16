@@ -1452,7 +1452,7 @@ function TutorView({ stats, updateStats, textClasses, apiKey }) {
             }
 
             const payload = { contents, systemInstruction: { parts: [{ text: systemPrompt }] } };
-            const url = `https://generativelanguage.googleapis.com/v1beta/interactions/${getModelText(apiKey)}:generateContent?key=${apiKey}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${getModelText(apiKey)}:generateContent?key=${apiKey}`;
             const result = await fetchWithRetry(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
 
             const replyText = result.candidates?.[0]?.content?.parts?.[0]?.text;
