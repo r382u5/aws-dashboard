@@ -1625,11 +1625,11 @@ function GuideView({ textClasses }) {
                         公式ガイド参照 <ExternalLink className="w-4 h-4 ml-1" />
                     </a>
                 </div>
-                <p className="text-gray-800 dark:text-gray-200"><strong>目的:</strong> AWSクラウドに関する総合的な理解を実証する。基礎的な知識（価値、セキュリティ、主要サービス、コストなど）を問う。</p>
-                <p className="text-gray-800 dark:text-gray-200"><strong>対象者:</strong> AWSクラウドの設計、実装、オペレーションの経験が6か月以下の初心者。コーディングや深いアーキテクチャ設計は範囲外。</p>
+                <p className="text-gray-800 dark:text-gray-200"><strong>目的:</strong> AWSクラウドに関する総合的な理解を実証する。基礎的な知識（価値、セキュリティ、主要サービス、コストなど）を問う。\n\n</p>
+                <p className="text-gray-800 dark:text-gray-200"><strong>対象者:</strong> AWSクラウドの設計、実装、オペレーションの経験が6か月以下の初心者。コーディングや深いアーキテクチャ設計は範囲外。\n\n</p>
                 <ul className="text-gray-800 dark:text-gray-200">
-                    <li><strong>問題数:</strong> 全65問（うちスコアに影響する採点対象は50問、<strong>スコアに影響しない採点対象外の設問が15問含まれます</strong>）</li>
-                    <li><strong>解答タイプ:</strong> 択一選択問題、複数選択問題</li>
+                    <li><strong>問題数:</strong> 全65問（うちスコアに影響する採点対象は50問、<strong>スコアに影響しない採点対象外の設問が15問含まれます\n\n</strong>）</li>
+                    <li><strong>解答タイプ:</strong> 択一選択問題、複数選択問題\n\n</li>
                     <li><strong>合格ライン:</strong> 1,000点満点中 <strong>700点</strong></li>
                 </ul>
 
