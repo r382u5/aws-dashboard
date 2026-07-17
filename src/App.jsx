@@ -14,10 +14,8 @@ import { getFirestore, doc, setDoc, onSnapshot } from 'firebase/firestore';
 // --- Configuration ---
 const SHOW_ESTIMATED_SCORE = false; // 推定スコアの表示/非表示を切り替えるフラグ
 
-// プレビュー環境では自動的に提供されます。個人のAPIキーを設定画面から入力できます。
 const fallbackApiKey = ""; 
 const isCanvasEnv = typeof __app_id !== 'undefined';
-// AIモデルの設定：個人のAPIキーを使う場合は安定版のモデルを使用します
 const getModelText = (key) => key ? "gemini-3.1-flash-lite" : "gemini-2.5-flash-preview-09-2025";
 
 // --- Firebase Init ---
@@ -25,14 +23,11 @@ let app, auth, db, appId;
 try {
     const configStr = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
     if (configStr) {
-        // プレビュー環境での自動設定
         app = initializeApp(JSON.parse(configStr));
         auth = getAuth(app);
         db = getFirestore(app);
         appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
     } else {
-        // ローカル環境・Vercel用の設定（Viteの環境変数を使用）
-        // ※Canvasプレビュー環境でもエラーが出ないように安全に取得しています
         const getEnv = (name) => {
             try {
                 if (typeof import.meta !== 'undefined' && import.meta.env) {
@@ -51,7 +46,6 @@ try {
             appId: getEnv('VITE_FIREBASE_APP_ID')
         };
         
-        // 値が設定されている場合のみ初期化を実行する（エラー回避）
         if (firebaseConfig.apiKey) {
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
@@ -119,9 +113,8 @@ const TASKS_BY_DOMAIN = {
 // --- Initial Data ---
 const INITIAL_QUIZZES = [];
 
-// --- 超・大幅拡充された単語カードデータ（厳選100枚） ---
+// --- Flashcards Data ---
 const FLASHCARDS = [
-    // --- 第1分野: クラウドのコンセプト (11枚) ---
     { term: "AWS CAF (Cloud Adoption Framework)", domain: "第1分野: クラウドのコンセプト", beginnerDesc: "クラウドを会社に導入する時の「道しるべ」。ビジネス、人など6つの視点から、どう進めるべきか教えてくれるガイドライン。", intermediateDesc: "組織のデジタルトランスフォーメーション(DX)を加速させるためのフレームワーク。6つのパースペクティブ（ビジネス、ピープル、ガバナンス、プラットフォーム、セキュリティ、オペレーション）から構成されます。", examTip: "試験で「クラウドへの移行戦略」や「6つの視点（パースペクティブ）」というキーワードが出たら、AWS CAFが正解です。" },
     { term: "AWS Well-Architected Framework", domain: "第1分野: クラウドのコンセプト", beginnerDesc: "良いシステムを作るための「設計の教科書」。セキュリティ、コスト、性能など6つの柱から、ベストな作り方を教えてくれる。", intermediateDesc: "システム設計のベストプラクティス集。運用上の優秀性、セキュリティ、信頼性、パフォーマンス効率、コスト最適化、持続可能性の6つの柱で構成されます。", examTip: "「設計原則」や「6つの柱」「持続可能性（サステナビリティ）」に関する設問で問われます。CAF（導入ガイド）とのひっかけに注意。" },
     { term: "スケーラビリティ (拡張性)", domain: "第1分野: クラウドのコンセプト", beginnerDesc: "アクセスが増えたときに、サーバーの性能を上げたり、台数を増やしたりしてパンクを防ぐ能力。", intermediateDesc: "システムがトラフィックの増加に応じて柔軟にリソースを拡張・縮小できる能力。Auto ScalingやELBが関連します。", examTip: "「需要に応じてリソースを調整する」という文脈で出題されます。伸縮性（Elasticity）とほぼ同義で扱われることも多いです。" },
@@ -134,7 +127,6 @@ const FLASHCARDS = [
     { term: "TCO (総所有コスト)", domain: "第1分野: クラウドのコンセプト", beginnerDesc: "サーバー代だけでなく、電気代や人件費、場所代など、システムを持つためにかかる『すべてのお金』のこと。", intermediateDesc: "Total Cost of Ownership。オンプレミスとAWSのコストを比較する際、ハードウェア調達費だけでなく運用、電力、冷却、ITリソース管理費などを含めた総コスト。", examTip: "「オンプレミスからAWSへ移行する際の財務的なメリットを評価する」ために用いる指標として出題されます。" },
     { term: "APN (AWS Partner Network)", domain: "第1分野: クラウドのコンセプト", beginnerDesc: "AWSを導入したい会社を助けてくれる、AWS公認の「専門家やプロの会社」のネットワーク。", intermediateDesc: "AWSを活用してソリューションやサービスを構築するテクノロジーおよびコンサルティングビジネス向けのグローバルパートナープログラム。", examTip: "「AWSの導入や運用を支援する第三者の専門家を探す」場合はAPNパートナー（コンサルティングパートナーなど）を利用します。" },
 
-    // --- 第2分野: セキュリティとコンプライアンス (23枚) ---
     { term: "AWS 責任共有モデル", domain: "第2分野: セキュリティとコンプライアンス", beginnerDesc: "「ここはAWSが守るから、ここはあなたが守ってね」という役割分担。AWSはデータセンターを、ユーザーはデータを守る。", intermediateDesc: "セキュリティに関する責任分界点。AWSはインフラストラクチャ（クラウドのセキュリティ）を、ユーザーはデータやOS、IAM（クラウドにおけるセキュリティ）を管理します。", examTip: "「パッチ適用は誰の責任か？」という問題が頻出。EC2のOSパッチは『お客様』、RDSのOSパッチは『AWS』の責任です。" },
     { term: "IAM (Identity and Access Management)", domain: "第2分野: セキュリティとコンプライアンス", beginnerDesc: "「誰が、どのサービスを、どう使えるか」を管理する門番のようなサービス。", intermediateDesc: "AWSリソースへのアクセスを安全に制御するサービス。ユーザー、グループ、ロールに対してIAMポリシーをアタッチして権限を管理します。", examTip: "「AWSリソースへのアクセス制御」「ユーザーの認証と認可」と来たらIAMです。多要素認証(MFA)の設定もIAMで行います。" },
     { term: "IAM リソース (ユーザー/グループ/ロール/ポリシー)", domain: "第2分野: セキュリティとコンプライアンス", beginnerDesc: "ユーザーは人、グループはその集まり、ロールは一時的な役割の帽子、ポリシーは「何をしていいか」の許可証。", intermediateDesc: "IAMの主要コンポーネント。ユーザーは永続的な認証情報、ロールは一時的な権限委任、ポリシーはJSON形式の権限定義ドキュメントです。", examTip: "「EC2に一時的な権限を与えるならロール」「権限の詳細定義ならポリシー」「複数人に同じ権限を付与するならグループ」と使い分けが頻出。" },
@@ -160,7 +152,6 @@ const FLASHCARDS = [
     { term: "AWS Secrets Manager", domain: "第2分野: セキュリティとコンプライアンス", beginnerDesc: "データベースのパスワードなどの「秘密の情報」を安全に保管し、定期的に自動で新しいものに変えてくれる金庫。", intermediateDesc: "データベースの認証情報、APIキーなどのシークレットを安全に保存し、ライフサイクル全体（自動ローテーションなど）を管理するサービス。", examTip: "「認証情報の自動ローテーション」「ソースコードへのパスワードのハードコード排除」がキーワードです。" },
     { term: "Amazon Cognito", domain: "第2分野: セキュリティとコンプライアンス", beginnerDesc: "自分が作ったWebサイトやアプリに「ログイン機能（ユーザー登録やパスワード忘れ対応など）」を簡単に追加できるサービス。", intermediateDesc: "ウェブアプリケーションやモバイルアプリケーションにユーザーのサインアップ、サインイン、およびアクセスコントロールを迅速に追加できるサービス。", examTip: "「Webアプリやモバイルアプリへのユーザー認証の追加」と来たらCognitoです。" },
 
-    // --- 第3分野: クラウドテクノロジーとサービス (52枚) ---
     { term: "リージョンとアベイラビリティーゾーン(AZ)", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "リージョンは「東京」などの大きな地域。AZはその中にある独立したデータセンターの集まり。複数のAZを使うことで災害に強くなる。", intermediateDesc: "リージョンは地理的な領域。各リージョンには、物理的に分離され冗長化された電源とネットワークを持つ複数のAZが存在し、高可用性を実現します。", examTip: "「高可用性を実現するアーキテクチャは？」と問われたら「複数のAZ（マルチAZ）に配置する」が正解です。" },
     { term: "Amazon EC2 (Elastic Compute Cloud)", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "AWS上で借りられる「仮想のパソコン（サーバー）」。OSを選んで好きなソフトを入れることができる。", intermediateDesc: "クラウド内の安全でサイズ変更可能なコンピューティング性能（仮想サーバー）を提供するサービス。完全なOSレベルの制御が可能です。", examTip: "「OSへの完全なアクセスが必要」「仮想サーバーを起動する」という要件を満たすサービスとして出題されます。" },
     { term: "AWS Lambda", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "サーバーを作らなくても、プログラム（コード）だけ用意すれば実行してくれる魔法のようなサービス。", intermediateDesc: "サーバーをプロビジョニングまたは管理せずにコードを実行できるサーバーレスコンピューティングサービス。ミリ秒単位の実行時間で課金されます。", examTip: "「サーバーの管理が不要（サーバーレス）」「イベント駆動でコードを実行する」というキーワードの決定打です。" },
@@ -214,7 +205,6 @@ const FLASHCARDS = [
     { term: "Amazon Rekognition", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "画像や動画をAIに見せると、「これは犬です」「この人は笑っています」と中身を分析してくれるサービス。", intermediateDesc: "機械学習の専門知識がなくても、アプリケーションに画像と動画の分析（顔認識、オブジェクト検出など）を簡単に追加できるサービス。", examTip: "「画像分析」「動画分析」「顔認識」がキーワード。" },
     { term: "AWS Outposts / Local Zones", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "Outpostsは自社にAWSのラックを持ち込むサービス。Local Zonesは大阪など大都市にある超高速なミニデータセンター。", intermediateDesc: "どちらも超低レイテンシーを実現するインフラ拡張。Outpostsはオンプレミス施設に配置し、Local Zonesは特定のエンドユーザーに物理的に近い場所に配置します。", examTip: "「自社のデータセンターでAWSを実行する」ならOutposts、「特定の都市のユーザーに1桁ミリ秒の応答を返す」ならLocal Zones。" },
 
-    // --- 第4分野: 請求、料金、サポート (14枚) ---
     { term: "AWS Organizations", domain: "第4分野: 請求、料金、サポート", beginnerDesc: "会社で使う複数のAWSアカウントを1つにまとめて、支払いを一緒にしたり、ルールを統一したりするサービス。", intermediateDesc: "複数のAWSアカウントを組織として統合・一元管理するサービス。一括請求（コンソリデーティッドビリング）やSCPによる権限の統制が可能です。", examTip: "「複数アカウントの一括請求（ボリュームディスカウントの共有）」「サービスコントロールポリシー(SCP)」と来たらOrganizationsです。" },
     { term: "AWS Cost Explorer", domain: "第4分野: 請求、料金、サポート", beginnerDesc: "「何にいくら使っているか」をグラフで分かりやすく表示し、未来のコストも予測してくれる家計簿ツール。", intermediateDesc: "時間経過に伴うAWSのコストと使用量を可視化、分析するツール。過去12ヶ月のデータ確認や、今後12ヶ月のコスト予測が可能です。", examTip: "「将来のコストを予測する」「コストの傾向を視覚的にグラフで分析する」というシナリオで正答になります。" },
     { term: "AWS Budgets", domain: "第4分野: 請求、料金、サポート", beginnerDesc: "「今月の予算を超えそう！」という時に、メールなどでアラート（警告）を飛ばしてくれるサービス。", intermediateDesc: "コストや使用量が、あらかじめ設定した予算のしきい値を超えた（または超えると予測された）場合に、アラートを送信するサービス。", examTip: "「予算を超過した場合に通知を受け取る」という要件では、Cost ExplorerではなくBudgetsを選んでください。" },
@@ -231,7 +221,6 @@ const FLASHCARDS = [
     { term: "AWS Health Dashboard", domain: "第4分野: 請求、料金、サポート", beginnerDesc: "AWS全体で障害が起きていないか（サービスヘルス）、自分の環境に影響する障害やメンテがないか（パーソナルヘルス）を確認できる掲示板。", intermediateDesc: "AWSサービスの全般的なステータス(Service Health)と、ユーザーの特定のリソースに影響を与える可能性のあるイベントやメンテナンス情報を統合して表示するダッシュボード。", examTip: "「自分に影響するAWSのメンテナンスイベントや障害の情報を得る」場合は、このHealth Dashboard（旧 Personal Health）が正解です。" }
 ];
 
-// --- Roadmap Data ---
 const ROADMAP_DATA = [
     {
         id: 'week1',
@@ -283,7 +272,8 @@ const ROADMAP_DATA = [
 const initialStats = {
     totalAnswered: 0,
     correctAnswers: 0,
-    totalStudyTime: 0, // 全期間の累積学習時間（秒）を追加
+    totalStudyTime: 0, 
+    recentResults: [], 
     domainStats: DOMAINS.reduce((acc, domain) => {
         acc[domain] = { total: 0, correct: 0 };
         return acc;
@@ -291,8 +281,7 @@ const initialStats = {
     dailyStats: {},
     roadmapProgress: [],
     settings: { textSize: 'md', theme: 'dark' },
-    examDate: null, // 追加: 受験日の管理
-    // AIチューターの会話履歴を保存するための初期ステートを追加
+    examDate: null, 
     tutorHistory: {
         guide: [
             { role: 'model', text: 'こんにちは！AWS認定クラウドプラクティショナー(CLF-C02)のガイドAIです。\n\nまずは「レベル1: クラウドの全体像とコンセプト」から始めますか？準備ができたら「始める」と教えてください。' }
@@ -303,7 +292,6 @@ const initialStats = {
     }
 };
 
-// --- Helper Functions ---
 const formatDateStr = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
 const formatStudyTimeStr = (totalSeconds) => {
@@ -317,7 +305,6 @@ const formatStudyTimeStr = (totalSeconds) => {
     return { value: m, unit: '分', full: `${m}分` };
 };
 
-// --- 追加: 残り日数の計算関数 ---
 const calculateDaysLeft = (examDateStr) => {
     if (!examDateStr) return null;
     const today = new Date();
@@ -328,13 +315,11 @@ const calculateDaysLeft = (examDateStr) => {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 };
 
-// --- Main Application Component ---
 export default function App() {
     const [currentView, setCurrentView] = useState('dashboard');
     const [quizPool, setQuizPool] = useState(INITIAL_QUIZZES);
     const [usedQuizIds, setUsedQuizIds] = useState([]);
     
-    // 追加: タイマー内で最新の画面状態を参照するためのRef
     const currentViewRef = useRef(currentView);
     useEffect(() => {
         currentViewRef.current = currentView;
@@ -343,10 +328,8 @@ export default function App() {
     const [user, setUser] = useState(null);
     const [stats, setStats] = useState(initialStats);
     
-    // APIキーのState（初期値はlocalStorageから取得）
     const [userApiKey, setUserApiKey] = useState(() => localStorage.getItem('aws_clf_gemini_api_key') || '');
     
-    // 追加: 受験日設定モーダルの表示状態
     const [showExamModal, setShowExamModal] = useState(false);
 
     const handleApiKeyUpdate = (key) => {
@@ -354,13 +337,9 @@ export default function App() {
         localStorage.setItem('aws_clf_gemini_api_key', key);
     };
 
-    // プレビュー環境のデフォルトキーか、ユーザーが入力したキーを使用
     const activeApiKey = fallbackApiKey || userApiKey;
-    
-    // 追加: 残り日数の計算
     const daysLeft = calculateDaysLeft(stats.examDate);
 
-    // Firebase Authentication
     useEffect(() => {
         if (!auth) return;
         const initAuth = async () => {
@@ -377,7 +356,6 @@ export default function App() {
         return () => unsubscribe();
     }, []);
 
-    // Firestore Data Sync
     useEffect(() => {
         if (!user || !db) return;
         const statsRef = doc(db, 'artifacts', appId, 'users', user.uid, 'appData', 'stats');
@@ -399,7 +377,6 @@ export default function App() {
         return () => unsubscribe();
     }, [user]);
 
-    // ユーザーアクティビティの監視（学習時間計測のための生存確認）
     const lastActiveTimeRef = useRef(Date.now());
     useEffect(() => {
         const handleActivity = () => {
@@ -421,34 +398,29 @@ export default function App() {
         };
     }, []);
 
-    // 学習時間の計測とFirestoreへの定期保存（1分ごと）
     useEffect(() => {
-        if (!user || !db) return; // ログイン前は計測しない
+        if (!user || !db) return; 
         
-        const INACTIVE_THRESHOLD = 1 * 60 * 1000; // 【変更】1分操作がなければ離席とみなす
+        const INACTIVE_THRESHOLD = 1 * 60 * 1000; 
         let localSeconds = 0;
 
         const timerId = setInterval(() => {
-            // 【対策A】ブラウザのタブが裏に回っている（非表示）場合はカウントしない
             if (document.hidden) {
                 return;
             }
 
-            // 【対策B】学習画面を開いている時のみカウントする
             const studyViews = ['quiz', 'flashcard', 'tutor'];
             if (!studyViews.includes(currentViewRef.current)) {
                 return;
             }
 
-            // アクティブな場合のみカウントアップ
             if (Date.now() - lastActiveTimeRef.current < INACTIVE_THRESHOLD) {
                 localSeconds += 1;
                 
-                // 1分(60秒)ごとに保存処理をトリガー
                 if (localSeconds >= 60) {
                     const today = formatDateStr(new Date());
                     const addedSeconds = localSeconds;
-                    localSeconds = 0; // リセット
+                    localSeconds = 0; 
                     
                     setStats(prevStats => {
                         const newStats = { ...prevStats };
@@ -456,10 +428,8 @@ export default function App() {
                         
                         if (!newStats.dailyStats) newStats.dailyStats = {};
                         if (!newStats.dailyStats[today]) newStats.dailyStats[today] = { answered: 0, correct: 0, studyTime: 0 };
-                        // 日別の学習時間も加算
                         newStats.dailyStats[today].studyTime = (newStats.dailyStats[today].studyTime || 0) + addedSeconds;
                         
-                        // DB同期処理（ローカルからの上書き）
                         const statsRef = doc(db, 'artifacts', appId, 'users', user.uid, 'appData', 'stats');
                         setDoc(statsRef, newStats, { merge: true }).catch(console.error);
                         
@@ -467,13 +437,13 @@ export default function App() {
                     });
                 }
             }
-        }, 1000); // 1秒ごとにチェック
+        }, 1000); 
 
         return () => clearInterval(timerId);
     }, [user, db]);
 
     const updateStats = async (newStats) => {
-        setStats(newStats); // UI即時反映
+        setStats(newStats);
         if (user && db) {
             try {
                 const statsRef = doc(db, 'artifacts', appId, 'users', user.uid, 'appData', 'stats');
@@ -482,7 +452,6 @@ export default function App() {
         }
     };
 
-    // テキストサイズに応じたクラスの定義
     const textSize = stats.settings?.textSize || 'md';
     const textClasses = {
         sm: { base: 'text-sm', lg: 'text-base', xl: 'text-lg', sm: 'text-xs', title: 'text-xl', big: 'text-2xl', super: 'text-3xl' },
@@ -490,7 +459,6 @@ export default function App() {
         lg: { base: 'text-lg', lg: 'text-xl', xl: 'text-2xl', sm: 'text-base', title: 'text-3xl', big: 'text-4xl', super: 'text-5xl' }
     }[textSize];
 
-    // テーマ設定
     const theme = stats.settings?.theme || 'dark';
 
     return (
@@ -498,63 +466,58 @@ export default function App() {
             {showExamModal && <ExamSettingsModal stats={stats} updateStats={updateStats} onClose={() => setShowExamModal(false)} textClasses={textClasses} />}
             
             <div className="flex w-full h-full bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-300">
-                {/* Sidebar Navigation */}
                 <nav className="w-20 md:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col shrink-0 z-10 shadow-sm transition-colors duration-300">
                     <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-center md:justify-start">
-                        <Cloud className="text-blue-600 dark:text-blue-400 w-8 h-8 shrink-0" /> {/* BrainをCloudに変更 */}
+                        <Cloud className="text-blue-600 dark:text-blue-400 w-8 h-8 shrink-0" />
                         <h1 className="text-sm md:text-base font-bold text-blue-600 dark:text-blue-400 ml-2 hidden md:block leading-tight">
                             AWS認定クラウド<br/>プラクティショナー<br/><span className="text-xs text-blue-500 dark:text-blue-400/80 font-normal">(CLF-C02)</span>
                         </h1>
                     </div>
                     <div className="flex-1 p-2 md:p-4 space-y-2 overflow-y-auto">
-                    <NavItem icon={<LayoutDashboard />} label="ダッシュボード" active={currentView === 'dashboard'} onClick={() => setCurrentView('dashboard')} />
-                    <NavItem icon={<HelpCircle />} label="模擬テスト" active={currentView === 'quiz'} onClick={() => setCurrentView('quiz')} />
-                    <NavItem icon={<BookOpen />} label="単語カード" active={currentView === 'flashcard'} onClick={() => setCurrentView('flashcard')} />
-                    <NavItem icon={<Map />} label="学習ロードマップ" active={currentView === 'roadmap'} onClick={() => setCurrentView('roadmap')} />
-                    <NavItem icon={<MessageSquare />} label="AIチューター" active={currentView === 'tutor'} onClick={() => setCurrentView('tutor')} />
-                    <NavItem icon={<FileText />} label="試験ガイド (要約)" active={currentView === 'guide'} onClick={() => setCurrentView('guide')} />
-                </div>
-                
-                {/* 追加: 試験日カウントダウンウィジェット */}
-                <div className="p-2 md:p-4 border-t border-gray-200 dark:border-gray-700 flex flex-col justify-end bg-gray-50/50 dark:bg-gray-800/50 transition-colors">
-                    <ExamCountdownWidget 
-                        stats={stats} 
-                        daysLeft={daysLeft} 
-                        onOpenModal={() => setShowExamModal(true)} 
-                        textClasses={textClasses} 
-                    />
-                </div>
-            </nav>
+                        <NavItem icon={<LayoutDashboard />} label="ダッシュボード" active={currentView === 'dashboard'} onClick={() => setCurrentView('dashboard')} />
+                        <NavItem icon={<HelpCircle />} label="模擬テスト" active={currentView === 'quiz'} onClick={() => setCurrentView('quiz')} />
+                        <NavItem icon={<BookOpen />} label="単語カード" active={currentView === 'flashcard'} onClick={() => setCurrentView('flashcard')} />
+                        <NavItem icon={<Map />} label="学習ロードマップ" active={currentView === 'roadmap'} onClick={() => setCurrentView('roadmap')} />
+                        <NavItem icon={<MessageSquare />} label="AIチューター" active={currentView === 'tutor'} onClick={() => setCurrentView('tutor')} />
+                        <NavItem icon={<FileText />} label="試験ガイド (要約)" active={currentView === 'guide'} onClick={() => setCurrentView('guide')} />
+                    </div>
+                    <div className="p-2 md:p-4 border-t border-gray-200 dark:border-gray-700 flex flex-col justify-end bg-gray-50/50 dark:bg-gray-800/50 transition-colors">
+                        <ExamCountdownWidget 
+                            stats={stats} 
+                            daysLeft={daysLeft} 
+                            onOpenModal={() => setShowExamModal(true)} 
+                            textClasses={textClasses} 
+                        />
+                    </div>
+                </nav>
 
-            {/* Main Content Area */}
-            <main className="flex-1 overflow-y-auto p-4 md:p-8">
-                {currentView === 'dashboard' && <DashboardView stats={stats} updateStats={updateStats} setUsedQuizIds={setUsedQuizIds} textClasses={textClasses} userApiKey={userApiKey} handleApiKeyUpdate={handleApiKeyUpdate} daysLeft={daysLeft} />}
-                {currentView === 'quiz' && (
-                    <QuizView 
-                        quizPool={quizPool} setQuizPool={setQuizPool}
-                        usedQuizIds={usedQuizIds} setUsedQuizIds={setUsedQuizIds}
-                        stats={stats} updateStats={updateStats} textClasses={textClasses}
-                        apiKey={activeApiKey}
-                    />
-                )}
-                {currentView === 'flashcard' && <FlashcardView textClasses={textClasses} />}
-                {currentView === 'roadmap' && <RoadmapView stats={stats} updateStats={updateStats} textClasses={textClasses} />}
-                {currentView === 'tutor' && <TutorView stats={stats} updateStats={updateStats} textClasses={textClasses} apiKey={activeApiKey} />}
-                {currentView === 'guide' && <GuideView textClasses={textClasses} />}
-            </main>
+                <main className="flex-1 overflow-y-auto p-4 md:p-8">
+                    {currentView === 'dashboard' && <DashboardView stats={stats} updateStats={updateStats} setUsedQuizIds={setUsedQuizIds} textClasses={textClasses} userApiKey={userApiKey} handleApiKeyUpdate={handleApiKeyUpdate} daysLeft={daysLeft} />}
+                    {currentView === 'quiz' && (
+                        <QuizView 
+                            quizPool={quizPool} setQuizPool={setQuizPool}
+                            usedQuizIds={usedQuizIds} setUsedQuizIds={setUsedQuizIds}
+                            stats={stats} updateStats={updateStats} textClasses={textClasses}
+                            apiKey={activeApiKey}
+                        />
+                    )}
+                    {currentView === 'flashcard' && <FlashcardView textClasses={textClasses} />}
+                    {currentView === 'roadmap' && <RoadmapView stats={stats} updateStats={updateStats} textClasses={textClasses} />}
+                    {currentView === 'tutor' && <TutorView stats={stats} updateStats={updateStats} textClasses={textClasses} apiKey={activeApiKey} />}
+                    {currentView === 'guide' && <GuideView textClasses={textClasses} />}
+                </main>
             </div>
         </div>
     );
 }
 
-// --- 追加: Sidebar Widget (Exam Countdown) ---
 function ExamCountdownWidget({ stats, daysLeft, onOpenModal, textClasses }) {
     if (daysLeft === null) {
         return (
             <div className="flex flex-col items-center justify-center text-center">
-                <button onClick={onOpenModal} className="w-full flex flex-col md:flex-row items-center justify-center p-3 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors border border-blue-200 dark:border-blue-800 border-dashed">
-                    <CalendarDays className="w-6 h-6 md:mr-2" />
-                    <span className={`hidden md:inline font-bold ${textClasses.sm}`}>試験日を設定</span>
+                <button onClick={onOpenModal} className="w-full flex flex-col items-center justify-center py-3 px-2 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all border border-blue-200 dark:border-blue-800 border-dashed shadow-sm">
+                    <CalendarDays className="w-5 h-5 md:w-6 md:h-6 mb-1 md:mb-2" />
+                    <span className="font-bold text-[10px] md:text-sm leading-tight">試験日を<br className="md:hidden" />設定</span>
                 </button>
             </div>
         );
@@ -562,36 +525,39 @@ function ExamCountdownWidget({ stats, daysLeft, onOpenModal, textClasses }) {
 
     if (daysLeft < 0) {
         return (
-            <div onClick={onOpenModal} className="w-full flex flex-col items-center justify-center p-3 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                <span className={`font-bold ${textClasses.sm}`}>試験日を過ぎました</span>
+            <div onClick={onOpenModal} className="w-full flex flex-col items-center justify-center p-3 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-all shadow-sm">
+                <span className="font-bold text-xs md:text-sm text-center">試験日を<br className="md:hidden" />過ぎました</span>
             </div>
         );
     }
 
-    let colorClass = "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800/50";
-    let iconColor = "text-blue-500 dark:text-blue-400";
+    let colorClass = "text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800/50 hover:bg-blue-100 dark:hover:bg-blue-900/50";
+    let iconColor = "text-blue-600 dark:text-blue-400";
     if (daysLeft === 0) {
-        colorClass = "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800/50";
-        iconColor = "text-red-500 dark:text-red-400";
+        colorClass = "text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800/50 hover:bg-red-100 dark:hover:bg-red-900/50";
+        iconColor = "text-red-600 dark:text-red-400";
     } else if (daysLeft <= 7) {
-        colorClass = "text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 border-amber-200 dark:border-amber-800/50";
-        iconColor = "text-amber-500 dark:text-amber-400";
+        colorClass = "text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/30 border-amber-200 dark:border-amber-800/50 hover:bg-amber-100 dark:hover:bg-amber-900/50";
+        iconColor = "text-amber-600 dark:text-amber-400";
     }
 
     return (
         <div 
             onClick={onOpenModal}
-            className={`w-full flex flex-col items-center justify-center p-2 md:p-3 rounded-xl border transition-colors cursor-pointer hover:opacity-80 ${colorClass}`}
+            className={`w-full flex flex-col items-center justify-center p-2 md:p-3 rounded-xl border transition-all cursor-pointer shadow-sm hover:shadow-md ${colorClass}`}
             title={`試験日: ${stats.examDate}`}
         >
-            <Target className={`w-6 h-6 mb-1 ${iconColor}`} />
-            <div className="hidden md:flex flex-col items-center">
+            <Target className={`w-5 h-5 md:w-6 md:h-6 mb-1 md:mb-2 ${iconColor}`} />
+            <div className="flex flex-col items-center text-center">
                 {daysLeft === 0 ? (
-                    <span className={`font-bold ${textClasses.lg}`}>本日 本番！</span>
+                    <span className="font-bold text-xs md:text-base">本日 本番！</span>
                 ) : (
                     <>
-                        <span className={`text-xs opacity-80 font-bold mb-0.5`}>試験まで あと</span>
-                        <span className={`font-black ${textClasses.xl} leading-none`}>{daysLeft}<span className="text-sm font-bold ml-0.5">日</span></span>
+                        <span className="text-[9px] md:text-xs opacity-80 font-bold mb-0.5">試験まで あと</span>
+                        <div className="flex items-baseline">
+                            <span className="font-black text-xl md:text-3xl leading-none tracking-tight">{daysLeft}</span>
+                            <span className="text-[10px] md:text-sm font-bold ml-0.5">日</span>
+                        </div>
                     </>
                 )}
             </div>
@@ -599,7 +565,6 @@ function ExamCountdownWidget({ stats, daysLeft, onOpenModal, textClasses }) {
     );
 }
 
-// --- 追加: Exam Settings Modal ---
 function ExamSettingsModal({ stats, updateStats, onClose, textClasses }) {
     const [dateStr, setDateStr] = useState(stats.examDate || '');
 
@@ -620,9 +585,7 @@ function ExamSettingsModal({ stats, updateStats, onClose, textClasses }) {
                     </button>
                 </div>
                 <div className="p-6">
-                    <p className={`text-gray-600 dark:text-gray-400 mb-4 ${textClasses.sm}`}>
-                        目標とする試験日を設定して、学習のモチベーションを高めましょう。（エフェクト等の機能は今後のアップデートで追加予定です）
-                    </p>
+                    <p className={`text-gray-600 dark:text-gray-400 mb-4 ${textClasses.sm}`}>目標とする試験日を設定しましょう。</p>
                     <input 
                         type="date" 
                         value={dateStr}
@@ -643,7 +606,6 @@ function ExamSettingsModal({ stats, updateStats, onClose, textClasses }) {
     );
 }
 
-// --- Navigation Item Component ---
 function NavItem({ icon, label, active, onClick }) {
     return (
         <button
@@ -659,27 +621,27 @@ function NavItem({ icon, label, active, onClick }) {
     );
 }
 
-// --- Dashboard View ---
 function DashboardView({ stats, updateStats, setUsedQuizIds, textClasses, userApiKey, handleApiKeyUpdate, daysLeft }) {
     const [showApiGuide, setShowApiGuide] = useState(false);
     
     const progressPercent = stats.totalAnswered > 0 ? (stats.correctAnswers / stats.totalAnswered) * 100 : 0;
     
-    const totalRoadmapTasks = 15; // 5 levels * 3 tasks
+    const totalRoadmapTasks = 15;
     const completedRoadmapTasks = stats.roadmapProgress?.length || 0;
     const roadmapPercent = (completedRoadmapTasks / totalRoadmapTasks) * 100;
-    const remainingTasks = totalRoadmapTasks - completedRoadmapTasks;
-
-    // --- 変更: 合格可能性メーター（独自のスコアリングロジック）の計算 ---
+    
     const TARGET_QUESTIONS = 400;
-    const TARGET_STUDY_SECONDS = 20 * 3600; // 20時間
+    const TARGET_STUDY_SECONDS = 20 * 3600; 
     
     let estimatedScore = 0;
     if (stats.totalAnswered > 0) {
-        // 全体の正答率
         const overallAcc = stats.correctAnswers / stats.totalAnswered;
         
-        // 分野別正答率（未回答の分野は全体正答率で補完）
+        const recentResults = stats.recentResults || [];
+        const recentAcc = recentResults.length > 0 
+            ? recentResults.filter(r => r).length / recentResults.length 
+            : overallAcc;
+        
         const getDomainAcc = (domainName) => {
             const dStat = stats.domainStats[domainName];
             return (dStat && dStat.total > 0) ? (dStat.correct / dStat.total) : overallAcc;
@@ -690,20 +652,15 @@ function DashboardView({ stats, updateStats, setUsedQuizIds, textClasses, userAp
         const d3Acc = getDomainAcc("第3分野: クラウドテクノロジーとサービス");
         const d4Acc = getDomainAcc("第4分野: 請求、料金、サポート");
 
-        // AWS CLFの配点割合に基づく加重平均 (100% = 1.0)
         const weightedAcc = (d1Acc * 0.24) + (d2Acc * 0.30) + (d3Acc * 0.34) + (d4Acc * 0.12);
 
-        // 独自のスコアリングロジック (最大1000点):
-        // ① 総合実力点 (最大350点): 総合正答率に基づく
-        // ② 分野別実力点 (最大350点): 分野別加重平均に基づく
-        // ③ 経験点 (最大150点): 目標問題数(400問)に対する達成率
-        // ④ 努力点 (最大150点): 目標学習時間(20時間)に対する達成率
-        const overallScore = overallAcc * 350;
-        const domainScore = weightedAcc * 350;
+        const recentScore = recentAcc * 400;
+        const overallScore = overallAcc * 150;
+        const domainScore = weightedAcc * 150;
         const qScore = Math.min(stats.totalAnswered / TARGET_QUESTIONS, 1.0) * 150;
         const tScore = Math.min(stats.totalStudyTime / TARGET_STUDY_SECONDS, 1.0) * 150;
 
-        estimatedScore = Math.round(overallScore + domainScore + qScore + tScore);
+        estimatedScore = Math.round(recentScore + overallScore + domainScore + qScore + tScore);
     }
 
     const resetStats = () => {
@@ -726,7 +683,6 @@ function DashboardView({ stats, updateStats, setUsedQuizIds, textClasses, userAp
 
     return (
         <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {/* APIキー未設定の場合のアラート */}
             {!userApiKey && (
                 <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-colors">
                     <div className="flex items-start">
@@ -770,7 +726,6 @@ function DashboardView({ stats, updateStats, setUsedQuizIds, textClasses, userAp
                 </div>
             </div>
 
-            {/* --- 変更: 合格可能性メーター (フラグで表示制御) --- */}
             {SHOW_ESTIMATED_SCORE && (
                 <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mb-8 transition-colors">
                     <h3 className={`font-bold flex items-center mb-6 text-gray-800 dark:text-gray-100 ${textClasses.xl}`}>
@@ -790,7 +745,6 @@ function DashboardView({ stats, updateStats, setUsedQuizIds, textClasses, userAp
                         </div>
                         
                         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-6 relative overflow-hidden">
-                            {/* 合格ラインのマーカー */}
                             <div className="absolute top-0 bottom-0 left-[70%] w-1 bg-red-500 z-10 shadow-[0_0_5px_rgba(239,68,68,0.8)]" title="合格ライン (700点)"></div>
                             <div 
                                 className={`h-6 rounded-full transition-all duration-1000 ease-out ${stats.totalAnswered === 0 ? 'bg-transparent' : (estimatedScore >= 700 ? 'bg-gradient-to-r from-green-400 to-green-500' : 'bg-gradient-to-r from-blue-400 to-blue-500')}`} 
@@ -807,7 +761,6 @@ function DashboardView({ stats, updateStats, setUsedQuizIds, textClasses, userAp
                 </div>
             )}
 
-            {/* Roadmap Progress Widget */}
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-6 rounded-2xl shadow-sm border border-blue-100 dark:border-blue-800/50 mb-8 transition-colors">
                 <div className="flex justify-between items-end mb-2">
                     <div>
@@ -827,7 +780,6 @@ function DashboardView({ stats, updateStats, setUsedQuizIds, textClasses, userAp
                 </div>
             </div>
 
-            {/* Calendar Widget */}
             <CalendarWidget dailyStats={stats.dailyStats} textClasses={textClasses} />
 
             <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mt-8 transition-colors">
@@ -853,7 +805,6 @@ function DashboardView({ stats, updateStats, setUsedQuizIds, textClasses, userAp
                 </div>
             </div>
 
-            {/* App Settings */}
             <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mt-8 mb-8 transition-colors">
                 <h3 className={`font-bold mb-4 flex items-center ${textClasses.xl}`}>
                     <Settings className="mr-2 text-blue-600 dark:text-blue-400" /> アプリ設定
@@ -901,7 +852,6 @@ function DashboardView({ stats, updateStats, setUsedQuizIds, textClasses, userAp
                         </button>
                     </div>
                     
-                    {/* APIキー設定欄の追加 */}
                     <div className="pt-4 border-t border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row sm:items-start gap-4">
                         <span className={`font-medium text-gray-700 dark:text-gray-300 shrink-0 sm:mt-2 ${textClasses.base}`}>Gemini APIキー:</span>
                         <div className="flex-1 w-full max-w-lg">
@@ -926,13 +876,11 @@ function DashboardView({ stats, updateStats, setUsedQuizIds, textClasses, userAp
                 </div>
             </div>
 
-            {/* API Key Guide Modal */}
             {showApiGuide && <ApiKeyGuideModal onClose={() => setShowApiGuide(false)} textClasses={textClasses} />}
         </div>
     );
 }
 
-// --- API Key Guide Modal Component ---
 function ApiKeyGuideModal({ onClose, textClasses }) {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
@@ -1015,7 +963,6 @@ function ApiKeyGuideModal({ onClose, textClasses }) {
     );
 }
 
-// --- Calendar Widget Component ---
 function CalendarWidget({ dailyStats, textClasses }) {
     const todayStr = formatDateStr(new Date());
     const [viewDate, setViewDate] = useState(new Date());
@@ -1047,7 +994,6 @@ function CalendarWidget({ dailyStats, textClasses }) {
             </h3>
             
             <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-                {/* Calendar Grid */}
                 <div className="flex-1 max-w-sm mx-auto w-full">
                     <div className="flex justify-between items-center mb-4 text-gray-800 dark:text-gray-100">
                         <button onClick={prevMonth} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition"><ChevronLeft className="w-5 h-5"/></button>
@@ -1067,7 +1013,6 @@ function CalendarWidget({ dailyStats, textClasses }) {
                             
                             let bgColor = "bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300";
                             if (dayData) {
-                                // 学習時間または回答数に応じてカレンダーに色をつける
                                 if (dayData.answered >= 10 || dayData.studyTime >= 3600) bgColor = "bg-green-500 dark:bg-green-600 text-white shadow-sm";
                                 else if (dayData.answered >= 5 || dayData.studyTime >= 1800) bgColor = "bg-green-400 dark:bg-green-500 text-white";
                                 else if (dayData.answered > 0 || dayData.studyTime > 0) bgColor = "bg-green-200 dark:bg-green-800 text-green-900 dark:text-green-100";
@@ -1091,7 +1036,6 @@ function CalendarWidget({ dailyStats, textClasses }) {
                     </div>
                 </div>
 
-                {/* Selected Date Details */}
                 <div className="w-full lg:w-64 bg-gray-50 dark:bg-gray-900/50 rounded-xl p-5 border border-gray-100 dark:border-gray-700 flex flex-col justify-center text-center lg:text-left transition-colors">
                     <p className={`text-gray-500 dark:text-gray-400 font-bold mb-2 ${textClasses.sm}`}>{selectedDate.replace(/-/g, '/')}</p>
                     {hasData ? (
@@ -1133,14 +1077,12 @@ function CalendarWidget({ dailyStats, textClasses }) {
     );
 }
 
-// --- Quiz View (模擬テスト) ---
 function QuizView({ quizPool, setQuizPool, usedQuizIds, setUsedQuizIds, stats, updateStats, textClasses, apiKey }) {
     const [generating, setGenerating] = useState(false);
-    const [difficulty, setDifficulty] = useState('初級'); // ここを'初級'に設定
+    const [difficulty, setDifficulty] = useState('初級');
     const [selectedDomain, setSelectedDomain] = useState('all');
     const [selectedTask, setSelectedTask] = useState('all');
     
-    // --- 履歴管理のためのステート ---
     const [sessionHistory, setSessionHistory] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -1149,20 +1091,16 @@ function QuizView({ quizPool, setQuizPool, usedQuizIds, setUsedQuizIds, stats, u
     const selectedOption = currentItem ? currentItem.selectedOption : null;
     const isAnswered = selectedOption !== null && selectedOption !== undefined;
 
-    // 分野が変更されたらタスクの絞り込みをリセットする
     useEffect(() => {
         setSelectedTask('all');
     }, [selectedDomain]);
 
-    // 未解答の新しい問題を取得・セットするロジック
     useEffect(() => {
         if (!currentQuiz) {
             let targetPool = quizPool.filter(q => !usedQuizIds.includes(q.id));
             
-            // 分野で絞り込み
             if (selectedDomain !== 'all') {
                 targetPool = targetPool.filter(q => q.domain === selectedDomain);
-                // タスクで絞り込み
                 if (selectedTask !== 'all') {
                     targetPool = targetPool.filter(q => q.task_id === selectedTask);
                 }
@@ -1182,7 +1120,6 @@ function QuizView({ quizPool, setQuizPool, usedQuizIds, setUsedQuizIds, stats, u
     const handleOptionClick = (idx) => {
         if (isAnswered || !currentQuiz) return;
         
-        // 解答を履歴に保存
         setSessionHistory(prev => {
             const newHistory = [...prev];
             newHistory[currentIndex] = { ...newHistory[currentIndex], selectedOption: idx };
@@ -1195,12 +1132,10 @@ function QuizView({ quizPool, setQuizPool, usedQuizIds, setUsedQuizIds, stats, u
         newStats.totalAnswered += 1;
         if (isCorrect) newStats.correctAnswers += 1;
         
-        // 追加: 直近の回答結果を追加 (最大70件)
         const newRecent = [...(newStats.recentResults || []), isCorrect];
-        if (newRecent.length > 70) newRecent.shift(); // 70を超えたら古いものを削除
+        if (newRecent.length > 70) newRecent.shift();
         newStats.recentResults = newRecent;
         
-        // Domain
         let domainKey = currentQuiz.domain;
         if(!DOMAINS.includes(domainKey)) {
              domainKey = DOMAINS.find(d => currentQuiz.domain.includes(d.split(':')[0])) || DOMAINS[0];
@@ -1210,7 +1145,6 @@ function QuizView({ quizPool, setQuizPool, usedQuizIds, setUsedQuizIds, stats, u
             if (isCorrect) newStats.domainStats[domainKey].correct += 1;
         }
 
-        // Daily
         const today = formatDateStr(new Date());
         if (!newStats.dailyStats) newStats.dailyStats = {};
         if (!newStats.dailyStats[today]) newStats.dailyStats[today] = { answered: 0, correct: 0, studyTime: 0 };
@@ -1248,7 +1182,6 @@ function QuizView({ quizPool, setQuizPool, usedQuizIds, setUsedQuizIds, stats, u
                      const taskLabel = TASKS_BY_DOMAIN[selectedDomain].find(t => t.id === selectedTask)?.title;
                      taskInstruction = `【最重要指示】出題内容は、タスク「${taskLabel}」に直接関連する知識に厳密に限定してください。task_idフィールドは必ず "${selectedTask}" に設定してください。`;
                 } else {
-                     // 特定分野の全タスクからランダムに指定数を選出してAIに指示
                      const domainTasks = TASKS_BY_DOMAIN[selectedDomain];
                      const shuffled = [...domainTasks].sort(() => 0.5 - Math.random());
                      const targetTasks = shuffled.slice(0, count);
@@ -1256,7 +1189,6 @@ function QuizView({ quizPool, setQuizPool, usedQuizIds, setUsedQuizIds, stats, u
                      taskInstruction = `【最重要指示】以下のタスクテーマに関連する問題を必ず作成してください: ${targetTaskLabels}。task_idフィールドには該当するタスクIDを正確に設定してください。`;
                 }
             } else {
-                // 全分野からランダムに指定数を選出してAIに指示することで偏りを防ぐ
                 const allTasks = Object.values(TASKS_BY_DOMAIN).flat();
                 const shuffledTasks = [...allTasks].sort(() => 0.5 - Math.random());
                 const targetTasks = shuffledTasks.slice(0, count);
@@ -1316,7 +1248,6 @@ ${taskInstruction}
             const newQuizzes = json.map(q => ({
                 ...q, 
                 id: crypto.randomUUID(),
-                // AIがタグ付けを間違えた場合でも、現在選択している条件を強制適用してフィルタリング漏れを防ぐ
                 domain: selectedDomain !== 'all' ? selectedDomain : q.domain,
                 task_id: selectedTask !== 'all' ? selectedTask : q.task_id
             }));
@@ -1484,25 +1415,21 @@ ${taskInstruction}
     );
 }
 
-// --- Flashcard View (単語カード) ---
 function FlashcardView({ textClasses }) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isFlipped, setIsFlipped] = useState(false);
     const [level, setLevel] = useState('初級');
     const [selectedDomain, setSelectedDomain] = useState('all');
 
-    // 選択された分野でカードを絞り込む
     const filteredCards = selectedDomain === 'all' 
         ? FLASHCARDS 
         : FLASHCARDS.filter(card => card.domain === selectedDomain);
 
-    // 分野が変更されたら最初のカードに戻す
     useEffect(() => {
         setCurrentIndex(0);
         setIsFlipped(false);
     }, [selectedDomain]);
 
-    // 万が一空になった場合のフォールバック（通常は発生しない）
     const card = filteredCards[currentIndex] || FLASHCARDS[0];
 
     const nextCard = () => { setIsFlipped(false); setTimeout(() => setCurrentIndex(p => (p + 1) % filteredCards.length), 150); };
@@ -1515,7 +1442,6 @@ function FlashcardView({ textClasses }) {
                     <BookOpen className="mr-2 text-blue-600 dark:text-blue-400" /> 単語カード
                 </h2>
                 
-                {/* 難易度切り替えと分野絞り込み */}
                 <div className="flex flex-col items-center mt-4 space-y-4">
                     <div className="bg-gray-200 dark:bg-gray-700 p-1 rounded-lg inline-flex shadow-inner transition-colors">
                         <button 
@@ -1608,11 +1534,9 @@ function FlashcardView({ textClasses }) {
     );
 }
 
-// --- AI Tutor View (AIチューター（質問）) ---
 function TutorView({ stats, updateStats, textClasses, apiKey }) {
-    const [mode, setMode] = useState('guide'); // 'guide' or 'qna'
+    const [mode, setMode] = useState('guide'); 
     
-    // Firestoreに保存された履歴（または初期値）を使用
     const activeMessages = stats.tutorHistory?.[mode] || initialStats.tutorHistory[mode];
     
     const setActiveMessages = (newMessagesOrUpdater) => {
@@ -1689,7 +1613,6 @@ function TutorView({ stats, updateStats, textClasses, apiKey }) {
         }
     };
 
-    // 簡単なマークダウン（太字と改行）のパース関数
     const renderFormattedText = (text) => {
         return text.split('\n').map((line, i) => (
             <React.Fragment key={i}>
@@ -1714,8 +1637,6 @@ function TutorView({ stats, updateStats, textClasses, apiKey }) {
 
     return (
         <div className="max-w-3xl mx-auto h-full flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden animate-in fade-in duration-300 transition-colors">
-            
-            {/* Header & Tabs */}
             <div className="bg-blue-600 dark:bg-blue-700 text-white flex flex-col transition-colors z-10 shadow-sm relative">
                 <div className="p-4 flex items-center justify-between">
                     <div className="flex items-center">
@@ -1746,7 +1667,6 @@ function TutorView({ stats, updateStats, textClasses, apiKey }) {
                 </div>
             </div>
 
-            {/* Chat Area */}
             <div className={`flex-1 overflow-y-auto p-4 md:p-6 space-y-6 transition-colors ${mode === 'guide' ? 'bg-indigo-50/40 dark:bg-indigo-900/10' : 'bg-gray-50/50 dark:bg-gray-900/50'}`}>
                 {mode === 'guide' && activeMessages.length === 1 && (
                     <div className="mb-6 p-4 bg-white dark:bg-gray-800 border border-indigo-100 dark:border-indigo-800/50 shadow-sm rounded-xl text-center transition-colors animate-in fade-in slide-in-from-top-2">
@@ -1791,7 +1711,6 @@ function TutorView({ stats, updateStats, textClasses, apiKey }) {
                 <div ref={messagesEndRef} />
             </div>
 
-            {/* Quick Actions */}
             {!isLoading && (
                 <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex flex-wrap gap-2 transition-colors">
                     {currentSuggestions.map((sug, i) => (
@@ -1806,7 +1725,6 @@ function TutorView({ stats, updateStats, textClasses, apiKey }) {
                 </div>
             )}
 
-            {/* Input Area */}
             <div className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 transition-colors">
                 <form onSubmit={handleSend} className="flex gap-2">
                     <input
@@ -1823,7 +1741,6 @@ function TutorView({ stats, updateStats, textClasses, apiKey }) {
     );
 }
 
-// --- Guide View ---
 function GuideView({ textClasses }) {
     return (
         <div className={`max-w-4xl mx-auto pb-10 animate-in fade-in duration-300 ${textClasses.base}`}>
@@ -1929,7 +1846,6 @@ function GuideView({ textClasses }) {
     );
 }
 
-// --- Roadmap View (学習ロードマップ) ---
 function RoadmapView({ stats, updateStats, textClasses }) {
     const toggleTask = (taskId) => {
         const currentProgress = stats.roadmapProgress || [];
