@@ -401,7 +401,7 @@ export default function App() {
     useEffect(() => {
         if (!user || !db) return; 
         
-        const INACTIVE_THRESHOLD = 1 * 60 * 1000; 
+        const INACTIVE_THRESHOLD = 3 * 60 * 1000; 
         let localSeconds = 0;
 
         const timerId = setInterval(() => {
