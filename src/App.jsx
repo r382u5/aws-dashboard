@@ -5,7 +5,7 @@ import {
     XCircle, AlertCircle, BarChart3, MessageSquare, Calendar, Settings,
     Sun, Moon, Map, CheckSquare, Square, PlayCircle, Cloud,
     Info, ExternalLink, Key, Trash2, User, Bot, Sparkles, Clock,
-    Target, CalendarDays
+    Target, CalendarDays, ClipboardList, Compass // Compass を追加
 } from 'lucide-react';
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'firebase/auth';
@@ -475,11 +475,11 @@ export default function App() {
                     </div>
                     <div className="flex-1 p-2 md:p-4 space-y-2 overflow-y-auto">
                         <NavItem icon={<LayoutDashboard />} label="ダッシュボード" active={currentView === 'dashboard'} onClick={() => setCurrentView('dashboard')} />
-                        <NavItem icon={<HelpCircle />} label="模擬テスト" active={currentView === 'quiz'} onClick={() => setCurrentView('quiz')} />
+                        <NavItem icon={<ClipboardList />} label="模擬テスト" active={currentView === 'quiz'} onClick={() => setCurrentView('quiz')} />
                         <NavItem icon={<BookOpen />} label="単語カード" active={currentView === 'flashcard'} onClick={() => setCurrentView('flashcard')} />
                         <NavItem icon={<Map />} label="学習ロードマップ" active={currentView === 'roadmap'} onClick={() => setCurrentView('roadmap')} />
                         <NavItem icon={<MessageSquare />} label="AIチューター" active={currentView === 'tutor'} onClick={() => setCurrentView('tutor')} />
-                        <NavItem icon={<FileText />} label="試験ガイド (要約)" active={currentView === 'guide'} onClick={() => setCurrentView('guide')} />
+                        <NavItem icon={<Compass />} label="試験ガイド (要約)" active={currentView === 'guide'} onClick={() => setCurrentView('guide')} />
                     </div>
                     <div className="p-2 md:p-4 border-t border-gray-200 dark:border-gray-700 flex flex-col justify-end bg-gray-50/50 dark:bg-gray-800/50 transition-colors">
                         <ExamCountdownWidget 
@@ -1271,7 +1271,7 @@ ${taskInstruction}
         <div className="max-w-3xl mx-auto h-full flex flex-col animate-in fade-in duration-300">
             <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4">
                 <h2 className={`font-bold flex items-center shrink-0 ${textClasses.title}`}>
-                    <HelpCircle className="mr-2 text-blue-600 dark:text-blue-400" /> 模擬テスト
+                    <ClipboardList className="mr-2 text-blue-600 dark:text-blue-400" /> 模擬テスト
                 </h2>
                 
                 <div className={`flex flex-wrap items-center bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 transition-colors gap-y-2 gap-x-2 ${textClasses.sm}`}>
@@ -1338,7 +1338,7 @@ ${taskInstruction}
                     </div>
                 ) : !currentQuiz ? (
                     <div className="bg-white dark:bg-gray-800 p-12 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center text-center transition-colors">
-                        <HelpCircle className="w-12 h-12 text-blue-400 dark:text-blue-500 mb-4" />
+                        <ClipboardList className="w-12 h-12 text-blue-400 dark:text-blue-500 mb-4" />
                         <h3 className={`font-bold mb-2 ${textClasses.xl}`}>問題を作成しましょう</h3>
                         <p className={`text-gray-500 dark:text-gray-400 mb-6 ${textClasses.base}`}>上のメニューから難易度や分野を選び、「作成」ボタンを押して新しい問題を作成してください。</p>
                         <button onClick={() => generateQuizzes(5)} className={`px-6 py-3 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 font-medium flex items-center transition ${textClasses.base}`}>
@@ -1751,7 +1751,7 @@ function GuideView({ textClasses }) {
     return (
         <div className={`max-w-4xl mx-auto pb-10 animate-in fade-in duration-300 ${textClasses.base}`}>
             <h2 className={`font-bold mb-6 flex items-center ${textClasses.title}`}>
-                <FileText className="mr-2 text-blue-600 dark:text-blue-400" /> 試験ガイド (要約)
+                <Compass className="mr-2 text-blue-600 dark:text-blue-400" /> 試験ガイド (要約)
             </h2>
             <div className="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-2xl shadow-lg dark:shadow-sm border border-white dark:border-gray-700 prose dark:prose-invert max-w-none prose-blue transition-colors">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b dark:border-gray-700 pb-2 mb-4">
