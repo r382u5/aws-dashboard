@@ -1235,6 +1235,12 @@ function QuizView({ quizPool, setQuizPool, usedQuizIds, setUsedQuizIds, stats, u
 - 中級と上級の問題文は、AWS公式試験特有のトーン（「ある企業が〜」「〜する最適な方法はどれですか。」）を使用してください。
 - 積極的に「プロビジョニング」「マネージド」「弾力性」「高可用性」「スケーラビリティ」などの用語を問題文に組み込んでください。
 
+【出題と選択肢のバリエーションに関する最重要ルール】
+- 毎回EC2、S3、IAM、RDSなどの有名な定番サービスばかり出題しないでください。
+- 指定されたタスクに関連する範囲で、できるだけ多様なサービス（例：Macie、GuardDuty、AWS Config、AWS Artifact、AWS Organizationsなど）を積極的に正解として取り上げてください。
+- 問題文のシナリオ（書き出し）も、「ある企業が〜」という定番のパターンだけでなく、「スタートアップの開発環境で〜」「監査要件を満たすために〜」「グローバル展開において〜」など、多様なシチュエーションを考案してください。
+- 架空のサービス名や実在しない機能は**絶対に**作成しないでください。すべてAWSの公式ドキュメントに存在する実在のサービスを使用してください。
+
 【難易度別の作成ルール】
 - 初級: AWSの基本的な用語、サービスの目的をストレートに問う一問一答形式。（選択肢は単一の単語）
 - 中級（本番標準）: 架空の企業の課題（シナリオ）を提示し、それを解決する最適なサービスや概念を選択させる形式。（選択肢は単一の単語、または短い説明）
@@ -1256,6 +1262,7 @@ ${taskInstruction}
                 contents: [{ parts: [{ text: `CLF-C02の模擬テストを作成してください（${count}問、難易度：${difficulty}）` }] }],
                 systemInstruction: { parts: [{ text: systemPrompt }] },
                 generationConfig: {
+                    temperature: 0.7,
                     responseMimeType: "application/json",
                     responseSchema: {
                         type: "ARRAY",
@@ -1281,12 +1288,30 @@ ${taskInstruction}
             if (!text) throw new Error("Empty response");
             
             const json = JSON.parse(text);
-            const newQuizzes = json.map(q => ({
-                ...q, 
-                id: crypto.randomUUID(),
-                domain: selectedDomain !== 'all' ? selectedDomain : q.domain,
-                task_id: selectedTask !== 'all' ? selectedTask : q.task_id
-            }));
+            const newQuizzes = json.map(q => {
+                // --- 選択肢の強制シャッフル処理 ---
+                const originalOptions = [...q.options];
+                const correctAnswerText = originalOptions[q.answerIndex]; // 元の正解のテキストを記憶
+                
+                const shuffledOptions = [...originalOptions];
+                // Fisher-Yatesアルゴリズムで配列をシャッフル
+                for (let i = shuffledOptions.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffledOptions[i], shuffledOptions[j]] = [shuffledOptions[j], shuffledOptions[i]];
+                }
+                
+                // シャッフル後の配列から、記憶しておいた正解のテキストを探して新しいインデックスを取得
+                const newAnswerIndex = shuffledOptions.indexOf(correctAnswerText);
+
+                return {
+                    ...q, 
+                    options: shuffledOptions,
+                    answerIndex: newAnswerIndex !== -1 ? newAnswerIndex : q.answerIndex, // 安全策として見つからなければ元のまま
+                    id: crypto.randomUUID(),
+                    domain: selectedDomain !== 'all' ? selectedDomain : q.domain,
+                    task_id: selectedTask !== 'all' ? selectedTask : q.task_id
+                };
+            });
             
             setQuizPool(prev => [...prev, ...newQuizzes]);
         } catch (error) {
