@@ -5,14 +5,14 @@ import {
     XCircle, AlertCircle, BarChart3, MessageSquare, Calendar, Settings,
     Sun, Moon, Map, CheckSquare, Square, PlayCircle, Cloud,
     Info, ExternalLink, Key, Trash2, User, Bot, Sparkles, Clock,
-    Target, CalendarDays, ClipboardList, Compass // Compass を追加
+    Target, CalendarDays, ClipboardList, Compass
 } from 'lucide-react';
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore, doc, setDoc, onSnapshot } from 'firebase/firestore';
 
 // --- Configuration ---
-const SHOW_ESTIMATED_SCORE = false; // 推定スコアの表示/非表示を切り替えるフラグ
+const SHOW_ESTIMATED_SCORE = false; 
 
 const fallbackApiKey = ""; 
 const isCanvasEnv = typeof __app_id !== 'undefined';
@@ -79,7 +79,6 @@ const DOMAINS = [
     "第4分野: 請求、料金、サポート"
 ];
 
-// --- Task Statements Data ---
 const TASKS_BY_DOMAIN = {
     "第1分野: クラウドのコンセプト": [
         { id: "1.1", title: "1.1: AWS クラウドの利点を定義する" },
@@ -110,10 +109,8 @@ const TASKS_BY_DOMAIN = {
     ]
 };
 
-// --- Initial Data ---
 const INITIAL_QUIZZES = [];
 
-// --- Flashcards Data ---
 const FLASHCARDS = [
     { term: "AWS CAF (Cloud Adoption Framework)", domain: "第1分野: クラウドのコンセプト", beginnerDesc: "クラウドを会社に導入する時の「道しるべ」。ビジネス、人など6つの視点から、どう進めるべきか教えてくれるガイドライン。", intermediateDesc: "組織のデジタルトランスフォーメーション(DX)を加速させるためのフレームワーク。6つのパースペクティブ（ビジネス、ピープル、ガバナンス、プラットフォーム、セキュリティ、オペレーション）から構成されます。", examTip: "試験で「クラウドへの移行戦略」や「6つの視点（パースペクティブ）」というキーワードが出たら、AWS CAFが正解です。" },
     { term: "AWS Well-Architected Framework", domain: "第1分野: クラウドのコンセプト", beginnerDesc: "良いシステムを作るための「設計の教科書」。セキュリティ、コスト、性能など6つの柱から、ベストな作り方を教えてくれる。", intermediateDesc: "システム設計のベストプラクティス集。運用上の優秀性、セキュリティ、信頼性、パフォーマンス効率、コスト最適化、持続可能性の6つの柱で構成されます。", examTip: "「設計原則」や「6つの柱」「持続可能性（サステナビリティ）」に関する設問で問われます。CAF（導入ガイド）とのひっかけに注意。" },
@@ -332,6 +329,24 @@ export default function App() {
     
     const [showExamModal, setShowExamModal] = useState(false);
 
+    const [dialogConfig, setDialogConfig] = useState({
+        isOpen: false,
+        type: 'alert', // 'alert' or 'confirm'
+        title: '',
+        message: '',
+        onConfirm: null
+    });
+
+    const closeDialog = () => setDialogConfig(prev => ({ ...prev, isOpen: false }));
+
+    const showAlert = (title, message) => {
+        setDialogConfig({ isOpen: true, type: 'alert', title, message, onConfirm: null });
+    };
+
+    const showConfirm = (title, message, onConfirm) => {
+        setDialogConfig({ isOpen: true, type: 'confirm', title, message, onConfirm });
+    };
+
     const handleApiKeyUpdate = (key) => {
         setUserApiKey(key);
         localStorage.setItem('aws_clf_gemini_api_key', key);
@@ -401,7 +416,7 @@ export default function App() {
     useEffect(() => {
         if (!user || !db) return; 
         
-        const INACTIVE_THRESHOLD = 3 * 60 * 1000; 
+        const INACTIVE_THRESHOLD = 3 * 60 * 1000; // 3分に変更済み
         let localSeconds = 0;
 
         const timerId = setInterval(() => {
@@ -463,6 +478,9 @@ export default function App() {
 
     return (
         <div className={`flex h-screen overflow-hidden font-sans ${theme === 'dark' ? 'dark' : ''}`}>
+            
+            {/* Custom Dialogs */}
+            <CustomDialog config={dialogConfig} onClose={closeDialog} textClasses={textClasses} />
             {showExamModal && <ExamSettingsModal stats={stats} updateStats={updateStats} onClose={() => setShowExamModal(false)} textClasses={textClasses} />}
             
             <div className="flex w-full h-full bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-300">
@@ -492,18 +510,18 @@ export default function App() {
                 </nav>
 
                 <main className="flex-1 overflow-y-auto p-4 md:p-8">
-                    {currentView === 'dashboard' && <DashboardView stats={stats} updateStats={updateStats} setUsedQuizIds={setUsedQuizIds} textClasses={textClasses} userApiKey={userApiKey} handleApiKeyUpdate={handleApiKeyUpdate} daysLeft={daysLeft} />}
+                    {currentView === 'dashboard' && <DashboardView stats={stats} updateStats={updateStats} setUsedQuizIds={setUsedQuizIds} textClasses={textClasses} userApiKey={userApiKey} handleApiKeyUpdate={handleApiKeyUpdate} daysLeft={daysLeft} showConfirm={showConfirm} />}
                     {currentView === 'quiz' && (
                         <QuizView 
                             quizPool={quizPool} setQuizPool={setQuizPool}
                             usedQuizIds={usedQuizIds} setUsedQuizIds={setUsedQuizIds}
                             stats={stats} updateStats={updateStats} textClasses={textClasses}
-                            apiKey={activeApiKey}
+                            apiKey={activeApiKey} showAlert={showAlert}
                         />
                     )}
                     {currentView === 'flashcard' && <FlashcardView textClasses={textClasses} />}
                     {currentView === 'roadmap' && <RoadmapView stats={stats} updateStats={updateStats} textClasses={textClasses} />}
-                    {currentView === 'tutor' && <TutorView stats={stats} updateStats={updateStats} textClasses={textClasses} apiKey={activeApiKey} />}
+                    {currentView === 'tutor' && <TutorView stats={stats} updateStats={updateStats} textClasses={textClasses} apiKey={activeApiKey} showAlert={showAlert} showConfirm={showConfirm} />}
                     {currentView === 'guide' && <GuideView textClasses={textClasses} />}
                 </main>
             </div>
@@ -526,7 +544,7 @@ function ExamCountdownWidget({ stats, daysLeft, onOpenModal, textClasses }) {
     if (daysLeft < 0) {
         return (
             <div onClick={onOpenModal} className="w-full flex flex-col items-center justify-center p-3 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-all shadow-sm">
-                <span className="font-bold text-xs md:text-sm text-center">試験日を<br className="md:hidden" />過ぎました</span>
+                <span className="font-bold text-[10px] md:text-sm leading-tight text-center">試験日を<br className="md:hidden" />過ぎました</span>
             </div>
         );
     }
@@ -550,10 +568,11 @@ function ExamCountdownWidget({ stats, daysLeft, onOpenModal, textClasses }) {
             <Target className={`w-5 h-5 md:w-6 md:h-6 mb-1 md:mb-2 ${iconColor}`} />
             <div className="flex flex-col items-center text-center">
                 {daysLeft === 0 ? (
-                    <span className="font-bold text-xs md:text-base">本日 本番！</span>
+                    <span className="font-bold text-[10px] md:text-base leading-tight">本日<br className="md:hidden" /> 本番！</span>
                 ) : (
                     <>
-                        <span className="text-[9px] md:text-xs opacity-80 font-bold mb-0.5">試験まで あと</span>
+                        <span className="text-[9px] md:text-xs opacity-80 font-bold mb-0.5 hidden md:block">試験まで あと</span>
+                        <span className="text-[9px] opacity-80 font-bold mb-0.5 md:hidden leading-none mt-1">あと</span>
                         <div className="flex items-baseline">
                             <span className="font-black text-xl md:text-3xl leading-none tracking-tight">{daysLeft}</span>
                             <span className="text-[10px] md:text-sm font-bold ml-0.5">日</span>
@@ -621,7 +640,7 @@ function NavItem({ icon, label, active, onClick }) {
     );
 }
 
-function DashboardView({ stats, updateStats, setUsedQuizIds, textClasses, userApiKey, handleApiKeyUpdate, daysLeft }) {
+function DashboardView({ stats, updateStats, setUsedQuizIds, textClasses, userApiKey, handleApiKeyUpdate, daysLeft, showConfirm }) {
     const [showApiGuide, setShowApiGuide] = useState(false);
     
     const progressPercent = stats.totalAnswered > 0 ? (stats.correctAnswers / stats.totalAnswered) * 100 : 0;
@@ -664,10 +683,10 @@ function DashboardView({ stats, updateStats, setUsedQuizIds, textClasses, userAp
     }
 
     const resetStats = () => {
-        if(window.confirm('学習データ（模擬テストの回答履歴、日別スコア、学習時間）をリセットしますか？')) {
+        showConfirm('確認', '学習データ（模擬テストの回答履歴、日別スコア、学習時間）を完全にリセットしますか？この操作は元に戻せません。', () => {
             updateStats({ ...initialStats, settings: stats.settings });
             setUsedQuizIds([]);
-        }
+        });
     };
 
     const handleTextSizeChange = (size) => {
@@ -1077,7 +1096,7 @@ function CalendarWidget({ dailyStats, textClasses }) {
     );
 }
 
-function QuizView({ quizPool, setQuizPool, usedQuizIds, setUsedQuizIds, stats, updateStats, textClasses, apiKey }) {
+function QuizView({ quizPool, setQuizPool, usedQuizIds, setUsedQuizIds, stats, updateStats, textClasses, apiKey, showAlert }) {
     const [generating, setGenerating] = useState(false);
     const [difficulty, setDifficulty] = useState('初級');
     const [selectedDomain, setSelectedDomain] = useState('all');
@@ -1167,7 +1186,7 @@ function QuizView({ quizPool, setQuizPool, usedQuizIds, setUsedQuizIds, stats, u
 
     const generateQuizzes = async (count) => {
         if (!apiKey && !isCanvasEnv) {
-            alert("Gemini APIキーが設定されていません。ダッシュボードの設定画面からAPIキーを入力してください。");
+            showAlert("APIキー未設定", "Gemini APIキーが設定されていません。ダッシュボードの設定画面からAPIキーを入力してください。");
             return;
         }
         
@@ -1261,7 +1280,7 @@ ${taskInstruction}
             setQuizPool(prev => [...prev, ...newQuizzes]);
         } catch (error) {
             console.error("Quiz gen fail:", error);
-            alert("問題の生成に失敗しました。時間をおいて再試行してください。");
+            showAlert("生成エラー", "問題の生成に失敗しました。時間をおいて再試行してください。");
         } finally {
             setGenerating(false);
         }
@@ -1540,7 +1559,7 @@ function FlashcardView({ textClasses }) {
     );
 }
 
-function TutorView({ stats, updateStats, textClasses, apiKey }) {
+function TutorView({ stats, updateStats, textClasses, apiKey, showAlert, showConfirm }) {
     const [mode, setMode] = useState('guide'); 
     
     const activeMessages = stats.tutorHistory?.[mode] || initialStats.tutorHistory[mode];
@@ -1576,7 +1595,7 @@ function TutorView({ stats, updateStats, textClasses, apiKey }) {
         if (!textToSend.trim() || isLoading) return;
         
         if (!apiKey && !isCanvasEnv) {
-            alert("Gemini APIキーが設定されていません。ダッシュボードの設定画面からAPIキーを入力してください。");
+            showAlert("APIキー未設定", "Gemini APIキーが設定されていません。ダッシュボードの設定画面からAPIキーを入力してください。");
             return;
         }
 
@@ -1614,9 +1633,9 @@ function TutorView({ stats, updateStats, textClasses, apiKey }) {
     };
 
     const handleReset = () => {
-        if (window.confirm('このモードの会話履歴をリセットしますか？')) {
+        showConfirm('確認', 'このモードの会話履歴を完全にリセットしますか？', () => {
             setActiveMessages(initialStats.tutorHistory[mode]);
-        }
+        });
     };
 
     const renderFormattedText = (text) => {
@@ -1918,6 +1937,51 @@ function RoadmapView({ stats, updateStats, textClasses }) {
                         </div>
                     );
                 })}
+            </div>
+        </div>
+    );
+}
+
+function CustomDialog({ config, onClose, textClasses }) {
+    if (!config.isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-sm overflow-hidden border border-gray-100 dark:border-gray-700 flex flex-col">
+                <div className="p-5 border-b border-gray-100 dark:border-gray-700 flex items-center bg-gray-50 dark:bg-gray-900/50">
+                    {config.type === 'alert' ? (
+                        <AlertCircle className="w-6 h-6 mr-2 text-amber-500" />
+                    ) : (
+                        <HelpCircle className="w-6 h-6 mr-2 text-blue-500" />
+                    )}
+                    <h3 className={`font-bold text-gray-800 dark:text-gray-100 ${textClasses.lg}`}>
+                        {config.title}
+                    </h3>
+                </div>
+                <div className="p-6">
+                    <p className={`text-gray-600 dark:text-gray-300 leading-relaxed ${textClasses.base}`}>
+                        {config.message}
+                    </p>
+                </div>
+                <div className="p-5 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3 bg-gray-50 dark:bg-gray-900/50">
+                    {config.type === 'confirm' && (
+                        <button 
+                            onClick={onClose} 
+                            className={`px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors font-medium ${textClasses.sm}`}
+                        >
+                            キャンセル
+                        </button>
+                    )}
+                    <button 
+                        onClick={() => {
+                            if (config.onConfirm) config.onConfirm();
+                            onClose();
+                        }} 
+                        className={`px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors shadow-sm ${textClasses.base}`}
+                    >
+                        OK
+                    </button>
+                </div>
             </div>
         </div>
     );
