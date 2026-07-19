@@ -733,7 +733,18 @@ function DashboardView({ stats, updateStats, setUsedQuizIds, textClasses, userAp
                 </div>
                 <div className="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center transition-colors text-center">
                     <p className={`text-gray-500 dark:text-gray-400 font-medium mb-1 ${textClasses.sm}`}>総学習時間</p>
-                    <p className={`font-bold text-indigo-600 dark:text-indigo-400 ${textClasses.super}`}>{studyTimeObj.value}<span className={`font-normal ml-1 ${textClasses.sm}`}>{studyTimeObj.unit}</span></p>
+                    <p className={`font-bold text-indigo-600 dark:text-indigo-400 flex items-baseline justify-center ${textClasses.super}`}>
+                        {studyTimeObj.hours > 0 ? (
+                            <>
+                                {studyTimeObj.hours}<span className={`font-normal mx-1 ${textClasses.sm}`}>時間</span>
+                                {studyTimeObj.minutes}<span className={`font-normal ml-0.5 ${textClasses.sm}`}>分</span>
+                            </>
+                        ) : (
+                            <>
+                                {studyTimeObj.value}<span className={`font-normal ml-1 ${textClasses.sm}`}>{studyTimeObj.unit}</span>
+                            </>
+                        )}
+                    </p>
                 </div>
                 <div className="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center transition-colors text-center">
                     <p className={`text-gray-500 dark:text-gray-400 font-medium mb-1 ${textClasses.sm}`}>回答済み問題</p>
