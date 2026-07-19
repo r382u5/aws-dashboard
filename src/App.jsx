@@ -181,7 +181,7 @@ const FLASHCARDS = [
     { term: "Amazon Route 53", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "「google.com」のようなドメイン名と、実際のサーバーの場所を紐付けて案内するサービス（DNS）。", intermediateDesc: "可用性と拡張性に優れたクラウドのドメインネームシステム (DNS) ウェブサービス。トラフィックのルーティングを行います。", examTip: "「ドメインの管理（DNS）」「ユーザーを最適なエンドポイントにルーティングする」役割で出題されます。" },
     { term: "Amazon CloudFront", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "世界中にデータを一時保存して、遠くのユーザーにも画像や動画を爆速で届けるサービス。", intermediateDesc: "データ、動画、アプリケーション、APIを世界中の視聴者に低レイテンシーで安全に配信するコンテンツ配信ネットワーク(CDN)サービス。", examTip: "「グローバルユーザーへの低レイテンシー配信」「エッジロケーションを利用してコンテンツをキャッシュする」がキーワードです。" },
     { term: "Elastic Load Balancing (ELB)", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "大量のアクセスが来た時に、複数のサーバーへ均等に仕事を振り分ける「交通整理の係員」。", intermediateDesc: "受信したアプリケーショントラフィックを、複数のEC2インスタンスやコンテナなどに自動的に分散し、耐障害性を高めるサービス。", examTip: "「トラフィックの負荷分散」「単一のEC2にアクセスが集中するのを防ぐ」というシナリオで正解になります。" },
-    { term: "Amazon API Gateway", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "作ったプログラム（Lambdaなど）を、外の世界から呼び出せるようにするための「受付窓口（API）」を作るサービス。", intermediateDesc: "あらゆる規模のAPIの作成、公開、保守、モニタリング、および保護を簡単に行うことができるフルマネージドサービス。", examTip: "「APIの作成と管理」「サーバーレスアーキテクチャのフロントドア（入り口）」がキーワード。" },
+    { term: "Amazon API Gateway", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "作ったプログラム（Lambdaなど）を、外の世界から呼び出せるようにするための「受付窓口（API）」を作るサービス。", intermediateDesc: "あらゆる規模のAPIの作成、公開、保守、モニタリング、および保護を簡単に行えるフルマネージドサービス。", examTip: "「APIの作成と管理」「サーバーレスアーキテクチャのフロントドア（入り口）」がキーワード。" },
     { term: "AWS Auto Scaling", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "忙しい時はサーバーの台数を自動で増やし、暇な時は減らしてくれる「自動増減機能」。", intermediateDesc: "ワークロードの需要に合わせてコンピューティングリソース（EC2インスタンスなど）を自動的にスケールアウト（拡張）およびスケールイン（縮小）する機能。", examTip: "「需要のスパイクに対応する」「使用されていないリソースを停止してコストを最適化する」のが主な役割です。" },
     { term: "AWS CloudFormation", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "サーバーやネットワークの設定を「設計図（コード）」として書いておけば、ボタン一つで全く同じ環境を自動で作ってくれるサービス。", intermediateDesc: "インフラストラクチャをコードとして扱う（IaC）ことで、AWSリソースのプロビジョニングと管理を自動化し、環境の複製を容易にするサービス。", examTip: "「Infrastructure as Code (IaC)」「テンプレートを使ってリソースを自動プロビジョニング」がキーワード。" },
     { term: "AWS Systems Manager", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "大量のEC2（サーバー）のパッチ当てや設定変更を、1台ずつやらずに一括で自動化できる便利な管理ツール。", intermediateDesc: "AWSやオンプレミス上のインフラストラクチャの可視化と制御を行い、運用タスク（パッチ適用など）を自動化するサービス。", examTip: "「フリート全体のパッチ適用（Patch Manager）」「運用タスクの自動化と一元管理」がキーワード。" },
@@ -416,7 +416,7 @@ export default function App() {
     useEffect(() => {
         if (!user || !db) return; 
         
-        const INACTIVE_THRESHOLD = 3 * 60 * 1000; // 3分に変更済み
+        const INACTIVE_THRESHOLD = 3 * 60 * 1000; 
         let localSeconds = 0;
 
         const timerId = setInterval(() => {
@@ -479,7 +479,6 @@ export default function App() {
     return (
         <div className={`flex h-screen overflow-hidden font-sans ${theme === 'dark' ? 'dark' : ''}`}>
             
-            {/* Custom Dialogs */}
             <CustomDialog config={dialogConfig} onClose={closeDialog} textClasses={textClasses} />
             {showExamModal && <ExamSettingsModal stats={stats} updateStats={updateStats} onClose={() => setShowExamModal(false)} textClasses={textClasses} />}
             
@@ -1675,17 +1674,29 @@ function TutorView({ stats, updateStats, textClasses, apiKey, showAlert, showCon
     };
 
     const renderFormattedText = (text) => {
-        return text.split('\n').map((line, i) => (
-            <React.Fragment key={i}>
-                {line.split(/(\*\*.*?\*\*)/g).map((part, j) => {
-                    if (part.startsWith('**') && part.endsWith('**')) {
-                        return <strong key={j} className="font-bold text-gray-900 dark:text-white">{part.slice(2, -2)}</strong>;
-                    }
-                    return <span key={j}>{part}</span>;
-                })}
-                {i !== text.split('\n').length - 1 && <br />}
-            </React.Fragment>
-        ));
+        return text.split('\n').map((line, i) => {
+            const parts = line.split(/(\*\*.*?\*\*)/);
+            
+            return (
+                <React.Fragment key={i}>
+                    {parts.map((part, j) => {
+                        if (part.startsWith('**') && part.endsWith('**')) {
+                            const innerText = part.slice(2, -2);
+                            return (
+                                <strong 
+                                    key={j} 
+                                    className={`font-bold px-2 py-0.5 mx-0.5 rounded-lg border inline-block shadow-sm ${mode === 'guide' ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-700' : 'bg-purple-50 dark:bg-purple-900/40 text-purple-800 dark:text-purple-300 border-purple-200 dark:border-purple-700'}`}
+                                >
+                                    {innerText}
+                                </strong>
+                            );
+                        }
+                        return <span key={j}>{part}</span>;
+                    })}
+                    {i !== text.split('\n').length - 1 && <br />}
+                </React.Fragment>
+            );
+        });
     };
 
     const qnaSuggestions = [
@@ -1697,53 +1708,72 @@ function TutorView({ stats, updateStats, textClasses, apiKey, showAlert, showCon
     const currentSuggestions = mode === 'guide' ? guideSuggestions : qnaSuggestions;
 
     return (
-        <div className="max-w-3xl mx-auto h-full flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden animate-in fade-in duration-300 transition-colors">
-            <div className="bg-blue-600 dark:bg-blue-700 text-white flex flex-col transition-colors z-10 shadow-sm relative">
+        <div className="w-full h-full flex flex-col md:max-w-4xl md:mx-auto bg-white dark:bg-gray-800 md:rounded-2xl md:shadow-sm md:border border-gray-200 dark:border-gray-700 overflow-hidden animate-in fade-in duration-300 transition-colors -mx-4 md:mx-auto w-[calc(100%+2rem)] md:w-full">
+            <div className={`text-white flex flex-col transition-colors z-10 shadow-md relative ${mode === 'guide' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-700 dark:to-indigo-800' : 'bg-gradient-to-r from-purple-600 to-fuchsia-600 dark:from-purple-700 dark:to-fuchsia-800'}`}>
                 <div className="p-4 flex items-center justify-between">
                     <div className="flex items-center">
                         <MessageSquare className="w-6 h-6 mr-2" />
-                        <h2 className={`font-bold ${textClasses.lg}`}>AIチューター</h2>
+                        <h2 className={`font-bold ${textClasses.title}`}>AIチューター</h2>
                     </div>
                     <button 
                         onClick={handleReset} 
-                        className="p-2 text-blue-100 hover:bg-blue-800 dark:hover:bg-blue-900 rounded-lg transition-colors flex items-center"
+                        className={`p-2 rounded-lg transition-colors flex items-center ${mode === 'guide' ? 'text-blue-100 hover:bg-blue-800 dark:hover:bg-blue-900' : 'text-purple-100 hover:bg-purple-800 dark:hover:bg-purple-900'}`}
                         title="会話を最初からやり直す"
                     >
                         <Trash2 className="w-5 h-5" />
                     </button>
                 </div>
-                <div className="flex bg-blue-700 dark:bg-blue-800 text-sm font-medium">
+                <div className={`flex px-2 pt-2 text-sm font-bold gap-2 ${mode === 'guide' ? 'bg-blue-700/50 dark:bg-blue-800/50' : 'bg-purple-700/50 dark:bg-purple-800/50'}`}>
                     <button 
                         onClick={() => setMode('guide')}
-                        className={`flex-1 py-3 flex items-center justify-center transition-colors ${mode === 'guide' ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 border-t-2 border-blue-500' : 'text-blue-100 hover:bg-blue-600 dark:hover:bg-blue-700'}`}
+                        className={`flex-1 py-3 px-4 flex items-center justify-center rounded-t-xl transition-all duration-200 ${mode === 'guide' ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] translate-y-[1px]' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}
                     >
-                        <PlayCircle className="w-4 h-4 mr-2" /> ガイド学習モード
+                        <PlayCircle className="w-5 h-5 mr-2" /> ガイド学習
                     </button>
                     <button 
                         onClick={() => setMode('qna')}
-                        className={`flex-1 py-3 flex items-center justify-center transition-colors ${mode === 'qna' ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 border-t-2 border-blue-500' : 'text-blue-100 hover:bg-blue-600 dark:hover:bg-blue-700'}`}
+                        className={`flex-1 py-3 px-4 flex items-center justify-center rounded-t-xl transition-all duration-200 ${mode === 'qna' ? 'bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] translate-y-[1px]' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}
                     >
-                        <MessageSquare className="w-4 h-4 mr-2" /> 自由に質問する
+                        <MessageSquare className="w-5 h-5 mr-2" /> 自由に質問
                     </button>
                 </div>
             </div>
 
-            <div className={`flex-1 overflow-y-auto p-4 md:p-6 space-y-6 transition-colors ${mode === 'guide' ? 'bg-indigo-50/40 dark:bg-indigo-900/10' : 'bg-gray-50/50 dark:bg-gray-900/50'}`}>
+            <div className={`flex-1 overflow-y-auto p-3 sm:p-6 space-y-6 transition-colors ${mode === 'guide' ? 'bg-blue-50/30 dark:bg-blue-900/10' : 'bg-purple-50/30 dark:bg-purple-900/10'}`}>
                 {mode === 'guide' && activeMessages.length === 1 && (
-                    <div className="mb-6 p-4 bg-white dark:bg-gray-800 border border-indigo-100 dark:border-indigo-800/50 shadow-sm rounded-xl text-center transition-colors animate-in fade-in slide-in-from-top-2">
-                        <p className={`text-indigo-800 dark:text-indigo-400 font-bold ${textClasses.sm}`}>💡 ガイドモードの使い方</p>
-                        <p className={`text-gray-600 dark:text-gray-400 mt-1 ${textClasses.sm}`}>AIが少しずつ講義を行い、途中で理解度クイズを出してくれます。会話を通じて学習を進めましょう！</p>
+                    <div className="mb-6 p-5 bg-white dark:bg-gray-800 border border-blue-100 dark:border-blue-800/50 shadow-sm rounded-2xl text-center transition-colors animate-in fade-in slide-in-from-top-2 mx-2 sm:mx-0">
+                        <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/50 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <Bot className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <p className={`text-blue-800 dark:text-blue-400 font-bold mb-2 ${textClasses.lg}`}>ガイドモードへようこそ！</p>
+                        <p className={`text-gray-600 dark:text-gray-400 leading-relaxed ${textClasses.sm}`}>
+                            AIが専属チューターとして、合格に必要な知識を順序立てて解説します。<br className="hidden sm:inline" />
+                            途中で出題されるクイズに答えながら、一緒に学習を進めましょう！
+                        </p>
+                    </div>
+                )}
+
+                {mode === 'qna' && activeMessages.length === 1 && (
+                    <div className="mb-6 p-5 bg-white dark:bg-gray-800 border border-purple-100 dark:border-purple-800/50 shadow-sm rounded-2xl text-center transition-colors animate-in fade-in slide-in-from-top-2 mx-2 sm:mx-0">
+                         <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <HelpCircle className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                        </div>
+                        <p className={`text-purple-800 dark:text-purple-400 font-bold mb-2 ${textClasses.lg}`}>何でも質問してください！</p>
+                        <p className={`text-gray-600 dark:text-gray-400 leading-relaxed ${textClasses.sm}`}>
+                            「EC2とS3の違いは？」「〇〇という問題の解説をして」など、<br className="hidden sm:inline" />
+                            AWSに関する疑問を自由にぶつけてみましょう。
+                        </p>
                     </div>
                 )}
                 
                 {activeMessages.map((msg, idx) => (
                     <div key={idx} className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                         {msg.role === 'model' && (
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shrink-0 shadow-sm mt-1 mr-3">
+                            <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm mt-1 mr-2 sm:mr-3 ${mode === 'guide' ? 'bg-gradient-to-br from-blue-500 to-indigo-600' : 'bg-gradient-to-br from-purple-500 to-fuchsia-600'}`}>
                                 <Bot className="w-5 h-5 text-white" />
                             </div>
                         )}
-                        <div className={`max-w-[80%] rounded-2xl p-4 shadow-sm transition-colors ${msg.role === 'user' ? 'bg-blue-600 dark:bg-blue-500 text-white rounded-tr-none' : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-300 rounded-tl-none'}`}>
+                        <div className={`max-w-[90%] sm:max-w-[80%] rounded-2xl p-4 shadow-sm transition-colors ${msg.role === 'user' ? (mode === 'guide' ? 'bg-blue-600 dark:bg-blue-500' : 'bg-purple-600 dark:bg-purple-500') + ' text-white rounded-tr-none' : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 rounded-tl-none'}`}>
                             {msg.role === 'model' ? (
                                 <div className={`leading-relaxed space-y-2 ${textClasses.base}`}>
                                     {renderFormattedText(msg.text)}
@@ -1753,15 +1783,15 @@ function TutorView({ stats, updateStats, textClasses, apiKey, showAlert, showCon
                             )}
                         </div>
                         {msg.role === 'user' && (
-                            <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-gray-700 flex items-center justify-center shrink-0 shadow-sm mt-1 ml-3">
-                                <User className="w-5 h-5 text-blue-600 dark:text-gray-300" />
+                            <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm mt-1 ml-2 sm:ml-3 ${mode === 'guide' ? 'bg-blue-100 dark:bg-gray-700' : 'bg-purple-100 dark:bg-gray-700'}`}>
+                                <User className={`w-5 h-5 ${mode === 'guide' ? 'text-blue-600 dark:text-gray-300' : 'text-purple-600 dark:text-gray-300'}`} />
                             </div>
                         )}
                     </div>
                 ))}
                 {isLoading && (
                     <div className="flex justify-start w-full">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shrink-0 shadow-sm mt-1 mr-3">
+                        <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm mt-1 mr-2 sm:mr-3 ${mode === 'guide' ? 'bg-gradient-to-br from-blue-500 to-indigo-600' : 'bg-gradient-to-br from-purple-500 to-fuchsia-600'}`}>
                             <Bot className="w-5 h-5 text-white" />
                         </div>
                         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl rounded-tl-none p-4 shadow-sm flex items-center space-x-2 transition-colors h-12">
@@ -1773,27 +1803,27 @@ function TutorView({ stats, updateStats, textClasses, apiKey, showAlert, showCon
             </div>
 
             {!isLoading && (
-                <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex flex-wrap gap-2 transition-colors">
+                <div className="px-3 sm:px-4 py-3 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex flex-wrap gap-2 transition-colors overflow-x-auto whitespace-nowrap scrollbar-hide">
                     {currentSuggestions.map((sug, i) => (
                         <button 
                             key={i} 
                             onClick={() => handleSend(sug)} 
-                            className={`px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-300 hover:text-blue-600 dark:hover:text-blue-300 transition-colors shadow-sm text-gray-600 dark:text-gray-300 ${textClasses.sm}`}
+                            className={`px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full transition-colors shadow-sm font-medium text-gray-700 dark:text-gray-200 shrink-0 ${textClasses.sm} ${mode === 'guide' ? 'hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-300 hover:text-blue-600 dark:hover:text-blue-300' : 'hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:border-purple-300 hover:text-purple-600 dark:hover:text-purple-300'}`}
                         >
-                            {mode === 'guide' ? sug : <><Sparkles className="w-3 h-3 inline mr-1 text-blue-500 dark:text-blue-400" />{sug}</>}
+                            {mode === 'guide' ? sug : <><Sparkles className={`w-4 h-4 inline mr-1.5 ${mode === 'guide' ? 'text-blue-500 dark:text-blue-400' : 'text-purple-500 dark:text-purple-400'}`} />{sug}</>}
                         </button>
                     ))}
                 </div>
             )}
 
-            <div className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 transition-colors">
+            <div className="p-3 sm:p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 transition-colors">
                 <form onSubmit={handleSend} className="flex gap-2">
                     <input
                         type="text" value={input} onChange={(e) => setInput(e.target.value)} disabled={isLoading}
-                        placeholder={mode === 'guide' ? "メッセージを入力..." : "AWSのサービスや概念について質問してください..."}
-                        className={`flex-1 p-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent dark:bg-gray-900 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors shadow-inner ${textClasses.base}`}
+                        placeholder={mode === 'guide' ? "メッセージを入力..." : "AWSについて質問してください..."}
+                        className={`flex-1 p-3 sm:p-4 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors shadow-inner ${textClasses.base} ${mode === 'guide' ? 'focus:ring-blue-500' : 'focus:ring-purple-500'}`}
                     />
-                    <button type="submit" disabled={!input.trim() || isLoading} className="p-3 bg-blue-600 dark:bg-blue-500 text-white rounded-xl hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50 transition-colors shrink-0 shadow-sm flex items-center justify-center">
+                    <button type="submit" disabled={!input.trim() || isLoading} className={`p-3 sm:p-4 text-white rounded-xl disabled:opacity-50 transition-colors shrink-0 shadow-sm flex items-center justify-center ${mode === 'guide' ? 'bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:bg-blue-600' : 'bg-purple-600 dark:bg-purple-500 hover:bg-purple-700 dark:bg-purple-600'}`}>
                         <Send className="w-6 h-6" />
                     </button>
                 </form>
