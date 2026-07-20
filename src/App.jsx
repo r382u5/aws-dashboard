@@ -1699,13 +1699,9 @@ function TutorView({ stats, updateStats, textClasses, apiKey, showAlert, showCon
         ));
     };
 
-    const qnaSuggestions = [
-        "EC2とS3の違いは？", "責任共有モデルについて教えて", "模擬テストの問題を1問出して"
-    ];
     const guideSuggestions = [
         "👍 理解しました！次へ進んでください", "🤔 もう少し詳しく教えてください"
     ];
-    const currentSuggestions = mode === 'guide' ? guideSuggestions : qnaSuggestions;
 
     return (
         <div className="max-w-3xl mx-auto h-full flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden animate-in fade-in duration-300 transition-colors">
@@ -1750,11 +1746,11 @@ function TutorView({ stats, updateStats, textClasses, apiKey, showAlert, showCon
                 {activeMessages.map((msg, idx) => (
                     <div key={idx} ref={idx === activeMessages.length - 1 ? lastMessageRef : null} className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                         {msg.role === 'model' && (
-                            <div className={`w-8 h-8 rounded-full bg-gradient-to-br flex items-center justify-center shrink-0 shadow-sm mt-1 mr-3 ${mode === 'guide' ? 'from-blue-500 to-indigo-600' : 'from-purple-500 to-fuchsia-600'}`}>
+                            <div className={`w-8 h-8 rounded-full bg-gradient-to-br flex items-center justify-center shrink-0 shadow-sm mt-1 mr-2 md:mr-3 ${mode === 'guide' ? 'from-blue-500 to-indigo-600' : 'from-purple-500 to-fuchsia-600'}`}>
                                 <Bot className="w-5 h-5 text-white" />
                             </div>
                         )}
-                        <div className={`max-w-[80%] rounded-2xl p-4 shadow-sm transition-colors ${msg.role === 'user' ? (mode === 'guide' ? 'bg-blue-600 dark:bg-blue-500' : 'bg-purple-600 dark:bg-purple-500') + ' text-white rounded-tr-none' : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-300 rounded-tl-none'}`}>
+                        <div className={`max-w-[92%] sm:max-w-[85%] md:max-w-[80%] rounded-2xl p-3 md:p-4 shadow-sm transition-colors ${msg.role === 'user' ? (mode === 'guide' ? 'bg-blue-600 dark:bg-blue-500' : 'bg-purple-600 dark:bg-purple-500') + ' text-white rounded-tr-none' : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-300 rounded-tl-none'}`}>
                             {msg.role === 'model' ? (
                                 <div className={`leading-relaxed space-y-2 ${textClasses.base}`}>
                                     {renderFormattedText(msg.text)}
@@ -1764,7 +1760,7 @@ function TutorView({ stats, updateStats, textClasses, apiKey, showAlert, showCon
                             )}
                         </div>
                         {msg.role === 'user' && (
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-sm mt-1 ml-3 ${mode === 'guide' ? 'bg-blue-100 dark:bg-gray-700 text-blue-600 dark:text-gray-300' : 'bg-purple-100 dark:bg-gray-700 text-purple-600 dark:text-gray-300'}`}>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-sm mt-1 ml-2 md:ml-3 ${mode === 'guide' ? 'bg-blue-100 dark:bg-gray-700 text-blue-600 dark:text-gray-300' : 'bg-purple-100 dark:bg-gray-700 text-purple-600 dark:text-gray-300'}`}>
                                 <User className="w-5 h-5" />
                             </div>
                         )}
@@ -1772,10 +1768,10 @@ function TutorView({ stats, updateStats, textClasses, apiKey, showAlert, showCon
                 ))}
                 {isLoading && (
                     <div className="flex justify-start w-full">
-                        <div className={`w-8 h-8 rounded-full bg-gradient-to-br flex items-center justify-center shrink-0 shadow-sm mt-1 mr-3 ${mode === 'guide' ? 'from-blue-500 to-indigo-600' : 'from-purple-500 to-fuchsia-600'}`}>
+                        <div className={`w-8 h-8 rounded-full bg-gradient-to-br flex items-center justify-center shrink-0 shadow-sm mt-1 mr-2 md:mr-3 ${mode === 'guide' ? 'from-blue-500 to-indigo-600' : 'from-purple-500 to-fuchsia-600'}`}>
                             <Bot className="w-5 h-5 text-white" />
                         </div>
-                        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl rounded-tl-none p-4 shadow-sm flex items-center space-x-2 transition-colors h-12">
+                        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl rounded-tl-none p-3 md:p-4 shadow-sm flex items-center space-x-2 transition-colors h-12">
                             <div className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce"></div><div className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div><div className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
                         </div>
                     </div>
@@ -1783,15 +1779,15 @@ function TutorView({ stats, updateStats, textClasses, apiKey, showAlert, showCon
                 <div ref={messagesEndRef} />
             </div>
 
-            {!isLoading && (
+            {!isLoading && mode === 'guide' && (
                 <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex flex-wrap gap-2 transition-colors">
-                    {currentSuggestions.map((sug, i) => (
+                    {guideSuggestions.map((sug, i) => (
                         <button 
                             key={i} 
                             onClick={() => handleSend(sug)} 
-                            className={`px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full hover:bg-opacity-80 transition-colors shadow-sm text-gray-600 dark:text-gray-300 ${textClasses.sm} ${mode === 'guide' ? 'hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-300 hover:text-blue-600 dark:hover:text-blue-300' : 'hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:border-purple-300 hover:text-purple-600 dark:hover:text-purple-300'}`}
+                            className={`px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full hover:bg-opacity-80 transition-colors shadow-sm text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-300 hover:text-blue-600 dark:hover:text-blue-300 ${textClasses.sm}`}
                         >
-                            {mode === 'guide' ? sug : <><Sparkles className={`w-3 h-3 inline mr-1 ${mode === 'guide' ? 'text-blue-500 dark:text-blue-400' : 'text-purple-500 dark:text-purple-400'}`} />{sug}</>}
+                            {sug}
                         </button>
                     ))}
                 </div>
