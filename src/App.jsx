@@ -292,14 +292,14 @@ const initialStats = {
 const formatDateStr = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
 const formatStudyTimeStr = (totalSeconds) => {
-    if (!totalSeconds) return { value: 0, unit: '分', full: '0分' };
+    if (!totalSeconds) return { value: 0, unit: '分', full: '0分', hours: 0, minutes: 0 };
     const h = Math.floor(totalSeconds / 3600);
     const m = Math.floor((totalSeconds % 3600) / 60);
     if (h > 0) {
-        return { value: h, unit: '時間', full: `${h}時間 ${m}分` };
+        return { value: h, unit: '時間', full: `${h}時間 ${m}分`, hours: h, minutes: m };
     }
-    if (m === 0) return { value: '< 1', unit: '分', full: '1分未満' };
-    return { value: m, unit: '分', full: `${m}分` };
+    if (m === 0) return { value: '< 1', unit: '分', full: '1分未満', hours: 0, minutes: 0 };
+    return { value: m, unit: '分', full: `${m}分`, hours: 0, minutes: m };
 };
 
 const calculateDaysLeft = (examDateStr) => {
