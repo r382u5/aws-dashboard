@@ -1650,9 +1650,9 @@ function TutorView({ stats, updateStats, textClasses, apiKey, showAlert, showCon
 1. ユーザーのペースに合わせて、ステップ・バイ・ステップで対話形式で教えること。長文で一気に説明しないこと。
 2. 1つのトピック（例：スケーラビリティ）を説明したら、「ここまでは理解できましたか？」と確認するか、簡単な理解度チェッククイズを1問出題してユーザーの返答を待つこと。
 3. ユーザーが正解したら褒めて次のトピックへ進み、間違えたら優しく解説すること。
-4. 常に励まし、モチベーションを高める言葉をかけること。重要なキーワードは**太字**にして強調してください。`;
+4. 常に励まし、モチベーションを高める言葉をかけること。重要なキーワードやAWSのサービス名は必ず**太字**で強調してください。`;
             } else {
-                systemPrompt = "あなたはAWS認定クラウドプラクティショナー(CLF-C02)の親切で優秀なAIチューターです。ユーザーの疑問に日本語で簡潔に、わかりやすく答えてください。重要な用語は**太字**にして強調してください。";
+                systemPrompt = "あなたはAWS認定クラウドプラクティショナー(CLF-C02)の親切で優秀なAIチューターです。ユーザーの疑問に日本語で簡潔に、わかりやすく答えてください。重要なキーワードやAWSのサービス名は必ず**太字**で強調してください。";
             }
 
             const payload = { contents, systemInstruction: { parts: [{ text: systemPrompt }] } };
@@ -1675,11 +1675,22 @@ function TutorView({ stats, updateStats, textClasses, apiKey, showAlert, showCon
     };
 
     const renderFormattedText = (text) => {
+        const highlightClass = mode === 'guide'
+            ? "bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/40 dark:border-blue-700 dark:text-blue-300"
+            : "bg-purple-50 border-purple-200 text-purple-800 dark:bg-purple-900/40 dark:border-purple-700 dark:text-purple-300";
+
         return text.split('\n').map((line, i) => (
             <React.Fragment key={i}>
                 {line.split(/(\*\*.*?\*\*)/g).map((part, j) => {
                     if (part.startsWith('**') && part.endsWith('**')) {
-                        return <strong key={j} className="font-bold text-gray-900 dark:text-white">{part.slice(2, -2)}</strong>;
+                        return (
+                            <strong 
+                                key={j} 
+                                className={`inline-flex items-center px-2 py-0.5 mx-1 my-0.5 rounded-md border font-bold text-[0.9em] shadow-sm align-baseline transition-colors ${highlightClass}`}
+                            >
+                                {part.slice(2, -2)}
+                            </strong>
+                        );
                     }
                     return <span key={j}>{part}</span>;
                 })}
@@ -1698,30 +1709,30 @@ function TutorView({ stats, updateStats, textClasses, apiKey, showAlert, showCon
 
     return (
         <div className="max-w-3xl mx-auto h-full flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden animate-in fade-in duration-300 transition-colors">
-            <div className="bg-blue-600 dark:bg-blue-700 text-white flex flex-col transition-colors z-10 shadow-sm relative">
+            <div className="flex flex-col border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 transition-colors z-10 relative">
                 <div className="p-4 flex items-center justify-between">
-                    <div className="flex items-center">
-                        <MessageSquare className="w-6 h-6 mr-2" />
-                        <h2 className={`font-bold ${textClasses.lg}`}>AIチューター</h2>
+                    <div className="flex items-center text-gray-800 dark:text-gray-100">
+                        <MessageSquare className={`w-6 h-6 mr-2 ${mode === 'guide' ? 'text-blue-600 dark:text-blue-400' : 'text-purple-600 dark:text-purple-400'}`} />
+                        <h2 className={`font-bold ${textClasses.title}`}>AIチューター</h2>
                     </div>
                     <button 
                         onClick={handleReset} 
-                        className="p-2 text-blue-100 hover:bg-blue-800 dark:hover:bg-blue-900 rounded-lg transition-colors flex items-center"
+                        className="p-2 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors flex items-center"
                         title="会話を最初からやり直す"
                     >
                         <Trash2 className="w-5 h-5" />
                     </button>
                 </div>
-                <div className="flex bg-blue-700 dark:bg-blue-800 text-sm font-medium">
+                <div className="flex px-4 bg-white dark:bg-gray-800 text-sm font-medium gap-2">
                     <button 
                         onClick={() => setMode('guide')}
-                        className={`flex-1 py-3 flex items-center justify-center transition-colors ${mode === 'guide' ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 border-t-2 border-blue-500' : 'text-blue-100 hover:bg-blue-600 dark:hover:bg-blue-700'}`}
+                        className={`flex-1 py-2 px-4 flex items-center justify-center transition-colors rounded-t-lg border-b-2 ${mode === 'guide' ? 'text-blue-600 dark:text-blue-400 border-blue-600 dark:border-blue-400 bg-blue-50/50 dark:bg-blue-900/20' : 'text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50'}`}
                     >
                         <PlayCircle className="w-4 h-4 mr-2" /> ガイド学習モード
                     </button>
                     <button 
                         onClick={() => setMode('qna')}
-                        className={`flex-1 py-3 flex items-center justify-center transition-colors ${mode === 'qna' ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 border-t-2 border-blue-500' : 'text-blue-100 hover:bg-blue-600 dark:hover:bg-blue-700'}`}
+                        className={`flex-1 py-2 px-4 flex items-center justify-center transition-colors rounded-t-lg border-b-2 ${mode === 'qna' ? 'text-purple-600 dark:text-purple-400 border-purple-600 dark:border-purple-400 bg-purple-50/50 dark:bg-purple-900/20' : 'text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50'}`}
                     >
                         <MessageSquare className="w-4 h-4 mr-2" /> 自由に質問する
                     </button>
@@ -1739,11 +1750,11 @@ function TutorView({ stats, updateStats, textClasses, apiKey, showAlert, showCon
                 {activeMessages.map((msg, idx) => (
                     <div key={idx} ref={idx === activeMessages.length - 1 ? lastMessageRef : null} className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                         {msg.role === 'model' && (
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shrink-0 shadow-sm mt-1 mr-3">
+                            <div className={`w-8 h-8 rounded-full bg-gradient-to-br flex items-center justify-center shrink-0 shadow-sm mt-1 mr-3 ${mode === 'guide' ? 'from-blue-500 to-indigo-600' : 'from-purple-500 to-fuchsia-600'}`}>
                                 <Bot className="w-5 h-5 text-white" />
                             </div>
                         )}
-                        <div className={`max-w-[80%] rounded-2xl p-4 shadow-sm transition-colors ${msg.role === 'user' ? 'bg-blue-600 dark:bg-blue-500 text-white rounded-tr-none' : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-300 rounded-tl-none'}`}>
+                        <div className={`max-w-[80%] rounded-2xl p-4 shadow-sm transition-colors ${msg.role === 'user' ? (mode === 'guide' ? 'bg-blue-600 dark:bg-blue-500' : 'bg-purple-600 dark:bg-purple-500') + ' text-white rounded-tr-none' : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-300 rounded-tl-none'}`}>
                             {msg.role === 'model' ? (
                                 <div className={`leading-relaxed space-y-2 ${textClasses.base}`}>
                                     {renderFormattedText(msg.text)}
@@ -1753,15 +1764,15 @@ function TutorView({ stats, updateStats, textClasses, apiKey, showAlert, showCon
                             )}
                         </div>
                         {msg.role === 'user' && (
-                            <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-gray-700 flex items-center justify-center shrink-0 shadow-sm mt-1 ml-3">
-                                <User className="w-5 h-5 text-blue-600 dark:text-gray-300" />
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-sm mt-1 ml-3 ${mode === 'guide' ? 'bg-blue-100 dark:bg-gray-700 text-blue-600 dark:text-gray-300' : 'bg-purple-100 dark:bg-gray-700 text-purple-600 dark:text-gray-300'}`}>
+                                <User className="w-5 h-5" />
                             </div>
                         )}
                     </div>
                 ))}
                 {isLoading && (
                     <div className="flex justify-start w-full">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shrink-0 shadow-sm mt-1 mr-3">
+                        <div className={`w-8 h-8 rounded-full bg-gradient-to-br flex items-center justify-center shrink-0 shadow-sm mt-1 mr-3 ${mode === 'guide' ? 'from-blue-500 to-indigo-600' : 'from-purple-500 to-fuchsia-600'}`}>
                             <Bot className="w-5 h-5 text-white" />
                         </div>
                         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl rounded-tl-none p-4 shadow-sm flex items-center space-x-2 transition-colors h-12">
@@ -1778,9 +1789,9 @@ function TutorView({ stats, updateStats, textClasses, apiKey, showAlert, showCon
                         <button 
                             key={i} 
                             onClick={() => handleSend(sug)} 
-                            className={`px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-300 hover:text-blue-600 dark:hover:text-blue-300 transition-colors shadow-sm text-gray-600 dark:text-gray-300 ${textClasses.sm}`}
+                            className={`px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full hover:bg-opacity-80 transition-colors shadow-sm text-gray-600 dark:text-gray-300 ${textClasses.sm} ${mode === 'guide' ? 'hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-300 hover:text-blue-600 dark:hover:text-blue-300' : 'hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:border-purple-300 hover:text-purple-600 dark:hover:text-purple-300'}`}
                         >
-                            {mode === 'guide' ? sug : <><Sparkles className="w-3 h-3 inline mr-1 text-blue-500 dark:text-blue-400" />{sug}</>}
+                            {mode === 'guide' ? sug : <><Sparkles className={`w-3 h-3 inline mr-1 ${mode === 'guide' ? 'text-blue-500 dark:text-blue-400' : 'text-purple-500 dark:text-purple-400'}`} />{sug}</>}
                         </button>
                     ))}
                 </div>
@@ -1790,10 +1801,10 @@ function TutorView({ stats, updateStats, textClasses, apiKey, showAlert, showCon
                 <form onSubmit={handleSend} className="flex gap-2">
                     <input
                         type="text" value={input} onChange={(e) => setInput(e.target.value)} disabled={isLoading}
-                        placeholder={mode === 'guide' ? "メッセージを入力..." : "AWSのサービスや概念について質問してください..."}
-                        className={`flex-1 p-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent dark:bg-gray-900 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors shadow-inner ${textClasses.base}`}
+                        placeholder={"メッセージを入力..."}
+                        className={`flex-1 p-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent dark:bg-gray-900 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors shadow-inner ${textClasses.base} ${mode === 'guide' ? 'focus:ring-blue-500' : 'focus:ring-purple-500'}`}
                     />
-                    <button type="submit" disabled={!input.trim() || isLoading} className="p-3 bg-blue-600 dark:bg-blue-500 text-white rounded-xl hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50 transition-colors shrink-0 shadow-sm flex items-center justify-center">
+                    <button type="submit" disabled={!input.trim() || isLoading} className={`p-3 text-white rounded-xl disabled:opacity-50 transition-colors shrink-0 shadow-sm flex items-center justify-center ${mode === 'guide' ? 'bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600' : 'bg-purple-600 dark:bg-purple-500 hover:bg-purple-700 dark:hover:bg-purple-600'}`}>
                         <Send className="w-6 h-6" />
                     </button>
                 </form>
