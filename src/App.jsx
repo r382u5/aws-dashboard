@@ -1042,10 +1042,8 @@ function CalendarWidget({ dailyStats, textClasses }) {
                             const isToday = dateStr === todayStr;
                             
                             let bgColor = "bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300";
-                            if (dayData) {
-                                if (dayData.answered >= 10 || dayData.studyTime >= 3600) bgColor = "bg-green-500 dark:bg-green-600 text-white shadow-sm";
-                                else if (dayData.answered >= 5 || dayData.studyTime >= 1800) bgColor = "bg-green-400 dark:bg-green-500 text-white";
-                                else if (dayData.answered > 0 || dayData.studyTime > 0) bgColor = "bg-green-200 dark:bg-green-800 text-green-900 dark:text-green-100";
+                            if (dayData && (dayData.answered > 0 || dayData.studyTime > 0)) {
+                                bgColor = "bg-green-500 dark:bg-green-600 text-white shadow-sm";
                             }
 
                             return (
