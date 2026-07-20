@@ -1752,11 +1752,11 @@ function TutorView({ stats, updateStats, textClasses, apiKey, showAlert, showCon
                         )}
                         <div className={`max-w-[92%] sm:max-w-[85%] md:max-w-[80%] rounded-2xl p-3 md:p-4 shadow-sm transition-colors ${msg.role === 'user' ? (mode === 'guide' ? 'bg-blue-600 dark:bg-blue-500' : 'bg-purple-600 dark:bg-purple-500') + ' text-white rounded-tr-none' : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-300 rounded-tl-none'}`}>
                             {msg.role === 'model' ? (
-                                <div className={`leading-relaxed space-y-2 ${textClasses.base}`}>
+                                <div className={`leading-relaxed space-y-2 break-words ${textClasses.base}`}>
                                     {renderFormattedText(msg.text)}
                                 </div>
                             ) : (
-                                <p className={`whitespace-pre-wrap leading-relaxed ${textClasses.base}`}>{msg.text}</p>
+                                <p className={`whitespace-pre-wrap leading-relaxed break-words ${textClasses.base}`}>{msg.text}</p>
                             )}
                         </div>
                         {msg.role === 'user' && (
@@ -1798,7 +1798,7 @@ function TutorView({ stats, updateStats, textClasses, apiKey, showAlert, showCon
                     <input
                         type="text" value={input} onChange={(e) => setInput(e.target.value)} disabled={isLoading}
                         placeholder={"メッセージを入力..."}
-                        className={`flex-1 p-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent dark:bg-gray-900 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors shadow-inner ${textClasses.base} ${mode === 'guide' ? 'focus:ring-blue-500' : 'focus:ring-purple-500'}`}
+                        className={`flex-1 min-w-0 p-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent dark:bg-gray-900 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:border-transparent transition-colors shadow-inner ${textClasses.base} ${mode === 'guide' ? 'focus:ring-blue-500' : 'focus:ring-purple-500'}`}
                     />
                     <button type="submit" disabled={!input.trim() || isLoading} className={`p-3 text-white rounded-xl disabled:opacity-50 transition-colors shrink-0 shadow-sm flex items-center justify-center ${mode === 'guide' ? 'bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600' : 'bg-purple-600 dark:bg-purple-500 hover:bg-purple-700 dark:hover:bg-purple-600'}`}>
                         <Send className="w-6 h-6" />
