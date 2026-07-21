@@ -1468,7 +1468,7 @@ ${taskInstruction}
                                             <><XCircle className="w-6 h-6 text-red-600 dark:text-red-400 mr-2" /> <span className={`font-bold text-red-800 dark:text-red-300 ${textClasses.lg}`}>不正解</span></>
                                         )}
                                     </div>
-                                    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-100/50 dark:border-gray-700 shadow-sm transition-colors">
+                                    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-100/50 dark:border-gray-700 shadow-sm transition-colors whitespace-pre-wrap">
                                         <p className={`text-gray-500 dark:text-gray-400 font-bold mb-2 ${textClasses.sm}`}>解説:</p>
                                         <p className={`text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap ${textClasses.base}`}>{currentQuiz.explanation}</p>
                                     </div>
