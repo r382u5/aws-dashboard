@@ -328,6 +328,7 @@ export default function App() {
     const [userApiKey, setUserApiKey] = useState(() => localStorage.getItem('aws_clf_gemini_api_key') || '');
     
     const [showExamModal, setShowExamModal] = useState(false);
+    const [pendingTutorMessage, setPendingTutorMessage] = useState(null);
 
     const [dialogConfig, setDialogConfig] = useState({
         isOpen: false,
@@ -517,11 +518,12 @@ export default function App() {
                             usedQuizIds={usedQuizIds} setUsedQuizIds={setUsedQuizIds}
                             stats={stats} updateStats={updateStats} textClasses={textClasses}
                             apiKey={activeApiKey} showAlert={showAlert}
+                            onAskTutor={(msg) => { setPendingTutorMessage(msg); setCurrentView('tutor'); }}
                         />
                     )}
                     {currentView === 'flashcard' && <FlashcardView textClasses={textClasses} />}
                     {currentView === 'roadmap' && <RoadmapView stats={stats} updateStats={updateStats} textClasses={textClasses} />}
-                    {currentView === 'tutor' && <TutorView stats={stats} updateStats={updateStats} textClasses={textClasses} apiKey={activeApiKey} showAlert={showAlert} showConfirm={showConfirm} />}
+                    {currentView === 'tutor' && <TutorView stats={stats} updateStats={updateStats} textClasses={textClasses} apiKey={activeApiKey} showAlert={showAlert} showConfirm={showConfirm} pendingTutorMessage={pendingTutorMessage} clearPendingTutorMessage={() => setPendingTutorMessage(null)} />}
                     {currentView === 'guide' && <GuideView textClasses={textClasses} />}
                 </main>
             </div>
@@ -1105,7 +1107,7 @@ function CalendarWidget({ dailyStats, textClasses }) {
     );
 }
 
-function QuizView({ quizPool, setQuizPool, usedQuizIds, setUsedQuizIds, stats, updateStats, textClasses, apiKey, showAlert }) {
+function QuizView({ quizPool, setQuizPool, usedQuizIds, setUsedQuizIds, stats, updateStats, textClasses, apiKey, showAlert, onAskTutor }) {
     const [generating, setGenerating] = useState(false);
     const [difficulty, setDifficulty] = useState('初級');
     const [selectedDomain, setSelectedDomain] = useState('all');
@@ -1450,6 +1452,22 @@ ${taskInstruction}
                                         <p className={`text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap ${textClasses.base}`}>{currentQuiz.explanation}</p>
                                     </div>
                                 </div>
+
+                                <div className="mt-4 flex justify-end">
+                                    <button 
+                                        onClick={() => {
+                                            const isCorrect = selectedOption === currentQuiz.answerIndex;
+                                            const userAnswer = currentQuiz.options[selectedOption];
+                                            const correctAnswer = currentQuiz.options[currentQuiz.answerIndex];
+                                            const message = `先ほど模擬テストで解いた以下の問題について質問があります。もう少し詳しく教えてください。\n\n【問題】\n${currentQuiz.question}\n\n【正解】\n${correctAnswer}\n\n【自分の回答】\n${userAnswer} (${isCorrect ? '正解' : '不正解'})\n\n【解説】\n${currentQuiz.explanation}`;
+                                            onAskTutor(message);
+                                        }}
+                                        className={`px-4 py-2.5 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/50 border border-purple-200 dark:border-purple-800/50 rounded-xl font-bold flex items-center shadow-sm transition-colors ${textClasses.sm}`}
+                                    >
+                                        <Bot className="w-5 h-5 mr-2" /> この問題をAIに質問する
+                                    </button>
+                                </div>
+
                                 <div className="mt-6 flex flex-col-reverse sm:flex-row justify-between items-center gap-3">
                                     <button onClick={handlePrev} disabled={currentIndex === 0} className={`w-full sm:w-auto px-5 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 font-bold flex items-center justify-center shadow-sm transition disabled:opacity-0 disabled:pointer-events-none ${textClasses.base}`}>
                                         <ChevronLeft className="mr-1 w-5 h-5" /> 前の問題に戻る
@@ -1486,6 +1504,19 @@ function FlashcardView({ textClasses }) {
 
     const nextCard = () => { setIsFlipped(false); setTimeout(() => setCurrentIndex(p => (p + 1) % filteredCards.length), 150); };
     const prevCard = () => { setIsFlipped(false); setTimeout(() => setCurrentIndex(p => (p - 1 + filteredCards.length) % filteredCards.length), 150); };
+
+    const randomCard = () => {
+        if (filteredCards.length <= 1) return; // カードが1枚以下の場合は何もしない
+        setIsFlipped(false);
+        setTimeout(() => {
+            let randomIndex = currentIndex;
+            // 今見ているカードとは「違うカード」が出るまでランダム抽出を繰り返す
+            while (randomIndex === currentIndex) {
+                randomIndex = Math.floor(Math.random() * filteredCards.length);
+            }
+            setCurrentIndex(randomIndex);
+        }, 150);
+    };
 
     return (
         <div className="max-w-3xl mx-auto h-full flex flex-col justify-center animate-in fade-in duration-300">
@@ -1529,6 +1560,15 @@ function FlashcardView({ textClasses }) {
 
             {filteredCards.length > 0 ? (
                 <>
+                    <div className="flex justify-center mb-6">
+                        <button 
+                            onClick={randomCard} 
+                            className={`px-5 py-2.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-xl font-bold flex items-center transition-colors shadow-sm ${textClasses.sm}`}
+                        >
+                            <RefreshCw className="w-4 h-4 mr-2" /> ランダムに出題
+                        </button>
+                    </div>
+
                     <div 
                         className="w-full max-w-lg min-h-[24rem] mx-auto cursor-pointer bg-white dark:bg-gray-800 border-2 border-blue-200 dark:border-blue-700 hover:border-blue-400 dark:hover:border-blue-500 rounded-2xl shadow-md p-6 md:p-8 transition-all duration-300 relative flex flex-col justify-center"
                         onClick={() => setIsFlipped(!isFlipped)}
@@ -1586,7 +1626,7 @@ function FlashcardView({ textClasses }) {
     );
 }
 
-function TutorView({ stats, updateStats, textClasses, apiKey, showAlert, showConfirm }) {
+function TutorView({ stats, updateStats, textClasses, apiKey, showAlert, showConfirm, pendingTutorMessage, clearPendingTutorMessage }) {
     const [mode, setMode] = useState('guide'); 
     
     const activeMessages = stats.tutorHistory?.[mode] || initialStats.tutorHistory[mode];
@@ -1609,6 +1649,17 @@ function TutorView({ stats, updateStats, textClasses, apiKey, showAlert, showCon
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef(null);
     const lastMessageRef = useRef(null);
+
+    useEffect(() => {
+        if (pendingTutorMessage) {
+            if (mode !== 'qna') {
+                setMode('qna');
+            } else {
+                handleSend(pendingTutorMessage);
+                clearPendingTutorMessage();
+            }
+        }
+    }, [pendingTutorMessage, mode]);
 
     useEffect(() => {
         if (isLoading) {
