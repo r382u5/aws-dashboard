@@ -1258,7 +1258,7 @@ function QuizView({ quizPool, setQuizPool, usedQuizIds, setUsedQuizIds, stats, u
 1. 範囲の厳格化: CLF-C02の試験範囲に限定すること。深いアーキテクチャ設計や、コーディングの知識を問うアソシエイトレベル以上の問題は絶対に作成しないこと。
 2. 架空のサービス禁止: 選択肢に架空のサービス名は絶対に作成せず、すべて実在する公式のAWSサービスを使用すること。
 3. 積極的なキーワード使用: 問題文には試験頻出の用語（プロビジョニング、マネージド、弾力性、高可用性、スケーラビリティ、オンプレミスなど）を積極的に組み込むこと。
-4. 解説のフォーマット: 長文を避け、必ず以下の形式で「見出し」と「箇条書き」と適切な位置に改行を使って出力すること。
+4. 解説のフォーマット: 長文を避け、必ず以下の形式で「見出し」と「箇条書き」を使って出力すること。
 【正解の理由】
 （正解となる理由を記載）
 【不正解の理由】
@@ -1459,7 +1459,7 @@ ${taskInstruction}
                         )}
 
                         {isAnswered && (
-                            <div className="mt-8 animate-in fade-in slide-in-from-top-4 duration-300 whitespace-pre-wrap">
+                            <div className="mt-8 animate-in fade-in slide-in-from-top-4 duration-300">
                                 <div className={`p-4 md:p-5 rounded-xl border transition-colors ${selectedOption === currentQuiz.answerIndex ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'}`}>
                                     <div className="flex items-center mb-3">
                                         {selectedOption === currentQuiz.answerIndex ? (
@@ -1468,7 +1468,7 @@ ${taskInstruction}
                                             <><XCircle className="w-6 h-6 text-red-600 dark:text-red-400 mr-2" /> <span className={`font-bold text-red-800 dark:text-red-300 ${textClasses.lg}`}>不正解</span></>
                                         )}
                                     </div>
-                                    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-100/50 dark:border-gray-700 shadow-sm transition-colors whitespace-pre-wrap">
+                                    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-100/50 dark:border-gray-700 shadow-sm transition-colors">
                                         <p className={`text-gray-500 dark:text-gray-400 font-bold mb-2 ${textClasses.sm}`}>解説:</p>
                                         <p className={`text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap ${textClasses.base}`}>{currentQuiz.explanation}</p>
                                     </div>
