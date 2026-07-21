@@ -432,7 +432,7 @@ export default function App() {
             if (Date.now() - lastActiveTimeRef.current < INACTIVE_THRESHOLD) {
                 localSeconds += 1;
                 
-                if (localSeconds >= 60) {
+                if (localSeconds >= 30) {
                     const today = formatDateStr(new Date());
                     const addedSeconds = localSeconds;
                     localSeconds = 0; 
@@ -1314,7 +1314,7 @@ ${taskInstruction}
     };
 
     return (
-        <div className="max-w-3xl mx-auto h-full flex flex-col animate-in fade-in duration-300">
+        <div className="max-w-4xl mx-auto h-full flex flex-col animate-in fade-in duration-300">
             <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4">
                 <h2 className={`font-bold flex items-center shrink-0 ${textClasses.title}`}>
                     <ClipboardList className="mr-2 text-blue-600 dark:text-blue-400" /> 模擬テスト
