@@ -1393,14 +1393,14 @@ ${taskInstruction}
                     </div>
                 ) : (
                     <div className="bg-white dark:bg-gray-800 p-4 md:p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
-                        <div className="mb-6 flex justify-between items-start">
-                            <div>
+                        <div className="mb-6 flex flex-col md:flex-row justify-between items-start">
+                            <div className="flex-1 w-full pr-0 md:pr-4">
                                 <span className={`inline-block px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full font-semibold mb-4 border border-gray-200 dark:border-gray-600 transition-colors ${textClasses.sm}`}>
                                     {currentQuiz.domain} {currentQuiz.task_id && `- タスク ${currentQuiz.task_id}`}
                                 </span>
                                 <h3 className={`font-bold leading-relaxed ${textClasses.xl}`}>{currentQuiz.question}</h3>
                             </div>
-                            <span className={`text-gray-400 dark:text-gray-500 font-bold shrink-0 ml-4 ${textClasses.sm}`}>Q. {currentIndex + 1}</span>
+                            <span className={`text-gray-400 dark:text-gray-500 font-bold shrink-0 mt-4 md:mt-0 ${textClasses.sm}`}>Q. {currentIndex + 1}</span>
                         </div>
 
                         <div className="space-y-3">
