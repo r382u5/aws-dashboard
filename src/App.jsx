@@ -1459,7 +1459,7 @@ ${taskInstruction}
                         )}
 
                         {isAnswered && (
-                            <div className="mt-8 animate-in fade-in slide-in-from-top-4 duration-300">
+                            <div className="mt-8 animate-in fade-in slide-in-from-top-4 duration-300 whitespace-pre-wrap">
                                 <div className={`p-4 md:p-5 rounded-xl border transition-colors ${selectedOption === currentQuiz.answerIndex ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'}`}>
                                     <div className="flex items-center mb-3">
                                         {selectedOption === currentQuiz.answerIndex ? (
