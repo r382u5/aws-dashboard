@@ -1376,14 +1376,14 @@ ${taskInstruction}
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto pb-8">
+            <div className="flex-1 overflow-y-auto pb-8 -mx-4 px-4 md:mx-0 md:px-0">
                 {generating ? (
-                    <div className="bg-white dark:bg-gray-800 p-12 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center h-64 transition-colors">
+                    <div className="bg-white dark:bg-gray-800 p-8 md:p-12 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center h-64 transition-colors">
                         <Loader2 className="w-10 h-10 text-blue-500 dark:text-blue-400 animate-spin mb-4" />
                         <p className={`text-gray-600 dark:text-gray-300 font-medium ${textClasses.base}`}>AIが新しい問題を作成しています...</p>
                     </div>
                 ) : !currentQuiz ? (
-                    <div className="bg-white dark:bg-gray-800 p-12 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center text-center transition-colors">
+                    <div className="bg-white dark:bg-gray-800 p-8 md:p-12 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center text-center transition-colors">
                         <ClipboardList className="w-12 h-12 text-blue-400 dark:text-blue-500 mb-4" />
                         <h3 className={`font-bold mb-2 ${textClasses.xl}`}>問題を作成しましょう</h3>
                         <p className={`text-gray-500 dark:text-gray-400 mb-6 ${textClasses.base}`}>上のメニューから難易度や分野を選び、「作成」ボタンを押して新しい問題を作成してください。</p>
@@ -1392,7 +1392,7 @@ ${taskInstruction}
                         </button>
                     </div>
                 ) : (
-                    <div className="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
+                    <div className="bg-white dark:bg-gray-800 p-4 md:p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
                         <div className="mb-6 flex justify-between items-start">
                             <div>
                                 <span className={`inline-block px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full font-semibold mb-4 border border-gray-200 dark:border-gray-600 transition-colors ${textClasses.sm}`}>
@@ -1416,7 +1416,7 @@ ${taskInstruction}
                                 return (
                                     <button
                                         key={idx} onClick={() => handleOptionClick(idx)} disabled={isAnswered}
-                                        className={`w-full text-left p-4 rounded-xl border-2 transition-all flex items-start ${btnClass} ${textClasses.base}`}
+                                        className={`w-full text-left p-3 md:p-4 rounded-xl border-2 transition-all flex items-start ${btnClass} ${textClasses.base}`}
                                     >
                                         <span className="shrink-0 inline-block w-8 font-bold text-gray-400 dark:text-gray-500">{String.fromCharCode(65 + idx)}.</span>
                                         <span className="flex-1">{opt}</span>
@@ -1437,7 +1437,7 @@ ${taskInstruction}
 
                         {isAnswered && (
                             <div className="mt-8 animate-in fade-in slide-in-from-top-4 duration-300">
-                                <div className={`p-5 rounded-xl border transition-colors ${selectedOption === currentQuiz.answerIndex ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'}`}>
+                                <div className={`p-4 md:p-5 rounded-xl border transition-colors ${selectedOption === currentQuiz.answerIndex ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'}`}>
                                     <div className="flex items-center mb-3">
                                         {selectedOption === currentQuiz.answerIndex ? (
                                             <><CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400 mr-2" /> <span className={`font-bold text-green-800 dark:text-green-300 ${textClasses.lg}`}>正解！</span></>
@@ -1445,16 +1445,16 @@ ${taskInstruction}
                                             <><XCircle className="w-6 h-6 text-red-600 dark:text-red-400 mr-2" /> <span className={`font-bold text-red-800 dark:text-red-300 ${textClasses.lg}`}>不正解</span></>
                                         )}
                                     </div>
-                                    <div className="bg-white dark:bg-gray-800 p-4 md:p-5 rounded-lg border border-gray-100/50 dark:border-gray-700 shadow-sm transition-colors">
+                                    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-100/50 dark:border-gray-700 shadow-sm transition-colors">
                                         <p className={`text-gray-500 dark:text-gray-400 font-bold mb-2 ${textClasses.sm}`}>解説:</p>
                                         <p className={`text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap ${textClasses.base}`}>{currentQuiz.explanation}</p>
                                     </div>
                                 </div>
-                                <div className="mt-6 flex justify-between items-center">
-                                    <button onClick={handlePrev} disabled={currentIndex === 0} className={`px-5 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 font-bold flex items-center shadow-sm transition disabled:opacity-0 disabled:pointer-events-none ${textClasses.base}`}>
+                                <div className="mt-6 flex flex-col-reverse sm:flex-row justify-between items-center gap-3">
+                                    <button onClick={handlePrev} disabled={currentIndex === 0} className={`w-full sm:w-auto px-5 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 font-bold flex items-center justify-center shadow-sm transition disabled:opacity-0 disabled:pointer-events-none ${textClasses.base}`}>
                                         <ChevronLeft className="mr-1 w-5 h-5" /> 前の問題に戻る
                                     </button>
-                                    <button onClick={handleNext} className={`px-6 py-3 bg-blue-600 dark:bg-blue-500 text-white rounded-xl hover:bg-blue-700 dark:hover:bg-blue-600 font-bold flex items-center shadow-sm transition ${textClasses.base}`}>
+                                    <button onClick={handleNext} className={`w-full sm:w-auto px-6 py-3 bg-blue-600 dark:bg-blue-500 text-white rounded-xl hover:bg-blue-700 dark:hover:bg-blue-600 font-bold flex items-center justify-center shadow-sm transition ${textClasses.base}`}>
                                         次の問題へ <ChevronRight className="ml-1 w-5 h-5" />
                                     </button>
                                 </div>
