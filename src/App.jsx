@@ -416,7 +416,7 @@ export default function App() {
     useEffect(() => {
         if (!user || !db) return; 
         
-        const INACTIVE_THRESHOLD = 3 * 60 * 1000; // 3分に変更済み
+        const INACTIVE_THRESHOLD = 2 * 60 * 1000; // 2分間に変更
         let localSeconds = 0;
 
         const timerId = setInterval(() => {
@@ -432,7 +432,7 @@ export default function App() {
             if (Date.now() - lastActiveTimeRef.current < INACTIVE_THRESHOLD) {
                 localSeconds += 1;
                 
-                if (localSeconds >= 30) {
+                if (localSeconds >= 45) { // 45秒ごとに保存
                     const today = formatDateStr(new Date());
                     const addedSeconds = localSeconds;
                     localSeconds = 0; 
