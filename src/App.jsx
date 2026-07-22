@@ -1277,6 +1277,7 @@ ${taskInstruction}
                 contents: [{ parts: [{ text: `CLF-C02の模擬テストを作成してください（${count}問、難易度：${difficulty}）` }] }],
                 systemInstruction: { parts: [{ text: systemPrompt }] },
                 generationConfig: {
+                    thinkingConfig: { thinkingLevel: "HIGH" },
                     responseMimeType: "application/json",
                     responseSchema: {
                         type: "ARRAY",
