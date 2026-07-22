@@ -16,7 +16,7 @@ const SHOW_ESTIMATED_SCORE = false;
 
 const fallbackApiKey = ""; 
 const isCanvasEnv = typeof __app_id !== 'undefined';
-const getModelText = (key) => key ? "gemini-3.1-flash-lite" : "gemini-2.5-flash-preview-09-2025";
+const getModelText = (key) => key ? "gemini-3.5-flash-lite" : "gemini-2.5-flash-preview-09-2025";
 
 // --- Firebase Init ---
 let app, auth, db, appId;
