@@ -215,7 +215,62 @@ const FLASHCARDS = [
     { term: "スポットインスタンス", domain: "第4分野: 請求、料金、サポート", beginnerDesc: "AWSが余らせているサーバーを格安で借りるプラン。途中で強制終了される可能性があるが一番安い。", intermediateDesc: "AWSの予備のEC2キャパシティを利用する料金モデル。最大90%の割引を受けられるが、AWS側でキャパシティが必要になると2分前の警告で中断されます。", examTip: "「中断されても問題ないバッチ処理」「いつでも再開可能な一時的なテスト」を最も安く実行する方法として出題されます。" },
     { term: "AWS Marketplace", domain: "第4分野: 請求、料金、サポート", beginnerDesc: "AWSで使える便利なソフトウェア（他の会社が作ったセキュリティソフトなど）を買ってすぐに使える「アプリストア」のような場所。", intermediateDesc: "独立系ソフトウェアベンダー(ISV)が提供する何千ものサードパーティー製ソフトウェアを検索、購入、デプロイ、管理できるデジタルカタログ。", examTip: "「サードパーティーのソフトウェアを購入・デプロイする」「ISVのソリューション」がキーワード。" },
     { term: "AWS サポートプラン", domain: "第4分野: 請求、料金、サポート", beginnerDesc: "困ったときの相談窓口。ベーシック(無料)、開発者、ビジネス、エンタープライズのランクがある。", intermediateDesc: "要件に応じて選択できるサポート体制。ビジネスプラン以上でAWS Trusted Advisorの全チェック項目や、24時間365日の電話サポートが利用可能になります。", examTip: "「24時間365日の電話サポート」が必要ならビジネス以上、「TAM（テクニカルアカウントマネージャー）」が必要ならエンタープライズです。" },
-    { term: "AWS Health Dashboard", domain: "第4分野: 請求、料金、サポート", beginnerDesc: "AWS全体で障害が起きていないか（サービスヘルス）、自分の環境に影響する障害やメンテがないか（パーソナルヘルス）を確認できる掲示板。", intermediateDesc: "AWSサービスの全般的なステータス(Service Health)と、ユーザーの特定のリソースに影響を与える可能性のあるイベントやメンテナンス情報を統合して表示するダッシュボード。", examTip: "「自分に影響するAWSのメンテナンスイベントや障害の情報を得る」場合は、このHealth Dashboard（旧 Personal Health）が正解です。" }
+    { term: "AWS Health Dashboard", domain: "第4分野: 請求、料金、サポート", beginnerDesc: "AWS全体で障害が起きていないか（サービスヘルス）、自分の環境に影響する障害やメンテがないか（パーソナルヘルス）を確認できる掲示板。", intermediateDesc: "AWSサービスの全般的なステータス(Service Health)と、ユーザーの特定のリソースに影響を与える可能性のあるイベントやメンテナンス情報を統合して表示するダッシュボード。", examTip: "「自分に影響するAWSのメンテナンスイベントや障害の情報を得る」場合は、このHealth Dashboard（旧 Personal Health）が正解です。" },
+ 
+    { term: "Amazon Lightsail", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "月額ワンコインから使える、初心者向けの簡単なレンタルサーバー（VPS）。設定がとてもシンプル。", intermediateDesc: "仮想サーバー、ストレージ、データベース、ネットワークを定額の予測可能な料金で提供する、使いやすいクラウドプラットフォーム。", examTip: "「予測可能な月額料金」「シンプルなWebサーバーの立ち上げ」「初心者向け」がキーワードです。" },
+    { term: "AWS Batch", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "数十万件の「バッチ処理（まとめて一気に計算する作業）」を、自動で一番効率よく実行してくれるサービス。", intermediateDesc: "開発者や科学者が、AWS上で数十万件のバッチコンピューティングジョブを簡単かつ効率的に実行できるフルマネージドサービス。", examTip: "「バッチ処理」「科学計算や機械学習の大量ジョブ」と来たらBatchです。" },
+    { term: "AWS CodeCommit", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "プログラムの設計図（ソースコード）を安全に保存し、チームで共有するためのプライベートな金庫（Gitリポジトリ）。", intermediateDesc: "安全で拡張性の高いプライベートGitリポジトリをホストする、フルマネージド型のソースコントロールサービス。", examTip: "「プライベートなGitリポジトリ」「ソースコードのバージョン管理」がキーワード。" },
+    { term: "AWS CodeBuild", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "人間が書いたプログラムを、パソコンで動かせる形に変換（ビルド）して、テストまで自動でやってくれる工場。", intermediateDesc: "ソースコードをコンパイルし、テストを実行し、デプロイ可能なソフトウェアパッケージを作成するフルマネージド型のビルドサービス。", examTip: "「ソースコードのコンパイルとテスト」「サーバーのプロビジョニング不要なビルド」がキーワード。" },
+    { term: "AWS CodeDeploy", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "完成したプログラムを、EC2などのサーバーに自動で配ってくれる「自動配達サービス」。", intermediateDesc: "EC2、Fargate、Lambda、オンプレミスサーバーなど、さまざまなコンピューティングサービスへのソフトウェアデプロイを自動化するサービス。", examTip: "「アプリケーションのデプロイを自動化する」「ダウンタイムを最小限に抑えるアップデート」がキーワード。" },
+    { term: "AWS CodePipeline", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "プログラムの開発から、テスト、サーバーへの配置（デプロイ）までの一連の流れを、全自動のベルトコンベアにしてくれるサービス。", intermediateDesc: "迅速で信頼性の高いアプリケーションのアップデートを実現する、フルマネージド型の継続的デリバリー (CI/CD) サービス。", examTip: "「リリースプロセスの自動化」「CI/CDパイプラインの構築」がキーワード。" },
+    { term: "AWS Cloud9", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "専用のソフトをインストールしなくても、Webブラウザ（Chromeなど）だけでプログラムが書ける開発環境。", intermediateDesc: "ブラウザのみでコードを記述、実行、デバッグできるクラウドベースの統合開発環境 (IDE)。", examTip: "「ブラウザベースのIDE」「環境構築の手間なくコードを記述・実行できる」がキーワード。" },
+    { term: "AWS CloudShell", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "AWSの管理画面（ブラウザ）の中で直接コマンドを打ち込んで、AWSを操作できる黒い画面。", intermediateDesc: "ブラウザベースのシェル環境。AWS CLIがあらかじめインストールされており、ローカル環境のセットアップなしにAWSリソースを安全に管理できます。", examTip: "「ブラウザから直接AWS CLIを実行する」「ローカルへのソフトウェアインストール不要」がキーワード。" },
+    { term: "Amazon Polly", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "テキスト（文字）を入力すると、人間の声のように自然に読み上げてくれるAIサービス。", intermediateDesc: "高度なディープラーニング技術を使用して、テキストをリアルな音声に変換するサービス。", examTip: "「テキストを音声に変換する (Text-to-Speech)」がキーワード。" },
+    { term: "Amazon Transcribe", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "会議の録音などの「音声データ」をAIに聞かせると、自動で文字起こしをしてくれるサービス。", intermediateDesc: "自動音声認識 (ASR) を使用して、アプリケーションに音声テキスト変換機能を簡単に追加できるサービス。", examTip: "「音声をテキストに変換する (Speech-to-Text)」がキーワード。" },
+    { term: "Amazon Translate", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "AIを使った高精度な「自動翻訳サービス」。多言語のWebサイトなどを簡単に作れる。", intermediateDesc: "高品質で流暢な言語翻訳を迅速かつ手頃な価格で提供する、ニューラル機械翻訳サービス。", examTip: "「言語翻訳」「アプリケーションの多言語対応」がキーワード。" },
+    { term: "Amazon Comprehend", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "大量の文章から「これは怒っている」「これはポジティブだ」などの感情やキーワードをAIが読み取ってくれるサービス。", intermediateDesc: "機械学習を使用して、テキスト内に含まれるインサイトや関係性（感情分析、キーフレーズ抽出など）を見つける自然言語処理 (NLP) サービス。", examTip: "「自然言語処理 (NLP)」「感情分析」「顧客レビューからのインサイト抽出」がキーワード。" },
+    { term: "Amazon Kendra", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "社内のバラバラなマニュアルや資料の中から、知りたい答えを正確に見つけ出してくれるAI搭載の賢い検索エンジン。", intermediateDesc: "機械学習を利用した、高精度で使いやすいエンタープライズ検索サービス。様々なデータソースを横断して検索できます。", examTip: "「エンタープライズ検索」「機械学習を用いた社内ドキュメントの検索」がキーワード。" },
+    { term: "Amazon Kinesis Data Firehose", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "絶え間なく流れてくる大量のデータ（ログなど）を、そのままS3やRedshiftの倉庫に直接「流し込む」ためのパイプ。", intermediateDesc: "ストリーミングデータをデータレイク、データストア、分析サービス（S3, Redshiftなど）に確実かつ簡単にロードするサービス。", examTip: "「ストリーミングデータをデータレイクやデータウェアハウスに直接ロード（保存）する」がキーワード。" },
+    { term: "Amazon AppSync", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "スマホアプリなどで、データが更新されたらすぐに画面にも反映される「リアルタイム通信」を簡単に作れるサービス。", intermediateDesc: "GraphQLとPub/Sub APIを利用して、複数のデータソースに安全にアクセスし、リアルタイムのデータ同期を提供するサービス。", examTip: "「GraphQL API」「リアルタイムでのデータ同期」がキーワード。" },
+    { term: "Amazon MQ", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "会社で昔から使っているメッセージ中継システムを、プログラムを書き換えずにそのままAWSに引っ越しさせるためのサービス。", intermediateDesc: "ActiveMQやRabbitMQなど、一般的なメッセージブローカー向けのマネージドサービス。既存のアプリケーションを変更せずにクラウドへ移行できます。", examTip: "「既存のメッセージブローカーとの互換性」「アプリケーションを書き換えずに移行」がキーワード（SQSとの違いに注意）。" },
+    { term: "AWS PrivateLink (VPCエンドポイント)", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "インターネットの公道を通らずに、AWSの中の専用の地下通路を使って、安全にサービス同士を繋ぐ仕組み。", intermediateDesc: "パブリックインターネットを経由せずに、VPCとAWSの各種サービス間でプライベートな接続を提供するネットワークテクノロジー。", examTip: "「インターネットを経由せずにAWSサービスにアクセスする」「トラフィックをAWSネットワーク内に留める」がキーワード。" },
+    { term: "AWS Client VPN", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "社員が自宅やカフェのパソコンから、会社のAWS環境（VPC）へ安全に接続するためのサービス。", intermediateDesc: "ユーザー（クライアント）がどこからでもAWSリソースやオンプレミスネットワークに安全にアクセスできるようにする、マネージド型のクライアントベースVPNサービス。", examTip: "Site-to-Site VPN（拠点間）との違いに注意。「リモートワーカー（個人デバイス）からVPCへの安全なアクセス」ならClient VPNです。" },
+    { term: "AWS Application Discovery Service", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "「今の会社のサーバー構成はどうなってる？」を自動で調査し、AWSへの引っ越し計画を立てるのを手伝ってくれる探偵サービス。", intermediateDesc: "オンプレミスサーバーのインベントリ、構成、使用状況のデータを収集し、AWSへの移行計画を支援するサービス。", examTip: "「移行計画の立案」「オンプレミス環境のデータ（構成や使用状況）を収集する」がキーワード。" },
+    { term: "AWS Migration Hub", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "色々なツールを使ってAWSへ引っ越しをしている時に、「いま引っ越しはどこまで進んでいるか」を1つの画面で確認できるまとめサイト。", intermediateDesc: "複数のAWSツールやパートナーソリューション全体にわたる、アプリケーションの移行進捗状況を単一の場所で追跡・追跡できるサービス。", examTip: "「移行状況の中央（一元的な）追跡」「ポートフォリオ全体の移行ステータスを可視化」がキーワード。" },
+    { term: "AWS Application Migration Service (MGN)", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "稼働中のサーバーを止めずに、中身をそっくりそのままAWSにコピーして引っ越し（リホスト）させる最強の引越し業者。", intermediateDesc: "物理サーバー、仮想サーバー、クラウドサーバーをAWSに迅速かつ自動的にリホスト（リフト＆シフト）する、推奨の移行サービス（SMSの後継）。", examTip: "「サーバーをそのままAWSにリホストする」「ダウンタイムを最小限に抑えたサーバー移行」がキーワード。" },
+    { term: "Amazon Connect", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "クラウド上で、あっという間にコールセンター（お客様サポート窓口）のシステムを作れるサービス。", intermediateDesc: "あらゆる規模のビジネスに対応する、使いやすいオムニチャネルのクラウドコンタクトセンターサービス。", examTip: "「クラウドベースのコンタクトセンター」「カスタマーサービスセンターの構築」がキーワード。" },
+    { term: "AWS Fault Injection Simulator (FIS)", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "システムがどれくらい障害に強いか確かめるために、本番環境にわざと障害（カオス）を起こしてテストするサービス。", intermediateDesc: "アプリケーションのパフォーマンス、オブザーバビリティ、回復力を向上させるために、フォールトインジェクション（カオスエンジニアリング）の実験を管理された環境で実行するサービス。", examTip: "「カオスエンジニアリング」「意図的に障害を注入して回復力をテストする」がキーワード。" },
+    { term: "AWS IAM Access Analyzer", domain: "第2分野: セキュリティとコンプライアンス", beginnerDesc: "S3やIAMの設定を分析して、「意図せず外部（別のアカウント）から見えちゃっている設定」がないか見つけ出すツール。", intermediateDesc: "リソースポリシーを数学的証明に基づいて分析し、意図しないパブリックアクセスやクロスアカウントアクセスを特定する機能。", examTip: "「外部からの意図しないアクセスの特定」「最小権限ポリシーの生成支援」がキーワード。" },
+    { term: "Amazon Detective", domain: "第2分野: セキュリティとコンプライアンス", beginnerDesc: "GuardDuty（パトロール隊）が怪しい動きを見つけた後、「なぜそれが起きたか」の根本原因を深く調査・分析する名探偵。", intermediateDesc: "機械学習、統計的分析、グラフ理論を使用して、潜在的なセキュリティ問題や不審なアクティビティの根本原因を調査および特定するサービス。", examTip: "「セキュリティインシデントの根本原因を調査・分析する」がキーワード。GuardDuty（検知）との役割分担に注意。" },
+    { term: "AWS Audit Manager", domain: "第2分野: セキュリティとコンプライアンス", beginnerDesc: "セキュリティやコンプライアンスの「監査（チェック）」を受けるために必要な証拠データを、自動で集めてレポートにしてくれるサービス。", intermediateDesc: "AWSの継続的な監査をサポートし、リスクとコンプライアンス要件の評価に必要な証拠（エビデンス）の収集を自動化するサービス。", examTip: "「コンプライアンス監査のための証拠収集を自動化する」がキーワード。" },
+    { term: "AWS Resource Access Manager (RAM)", domain: "第2分野: セキュリティとコンプライアンス", beginnerDesc: "自分が作ったVPCなどのリソースを、別のAWSアカウントと安全に「共有」するためのサービス。", intermediateDesc: "AWSアカウント間で、またはAWS Organizations内の組織やOUと、AWSリソース（サブネット、Transit Gatewayなど）を安全かつ簡単に共有できるサービス。", examTip: "「複数のアカウント間でリソースを共有する」「サブネットの共有」がキーワード。" },
+    { term: "AWS Systems Manager Parameter Store", domain: "第2分野: セキュリティとコンプライアンス", beginnerDesc: "パスワードやデータベースの接続情報など、プログラムで使う「設定データ」を安全に保存しておく場所。", intermediateDesc: "設定データ管理と機密管理のための安全な階層型ストレージを提供する機能。", examTip: "Secrets Manager（高価・自動更新あり）との違いに注意。「無料でパスワードや設定情報を保存したい」場合はこちらです。" },
+    { term: "AWS Cost Anomaly Detection", domain: "第4分野: 請求、料金、サポート", beginnerDesc: "AIが毎日の料金を監視して、「あれ、いつもより急に高くなってるぞ？」という異常（無駄遣い）を見つけて教えてくれる機能。", intermediateDesc: "高度な機械学習テクノロジーを使用して、異常な支出の根本原因を特定し、コストの急増を最小限に抑える機能。", examTip: "「予期しない（異常な）コストの急増を検出して通知する」がキーワード。" },
+    { term: "AWS Cost Categories", domain: "第4分野: 請求、料金、サポート", beginnerDesc: "AWSの料金を「これは開発チーム」「これは営業チーム」のように、自社独自のルールで自由に振り分けて管理できる機能。", intermediateDesc: "コストと使用量のアカウントやタグ付け情報を基に、組織の構造やビジネスニーズ（チーム別、プロジェクト別など）に合わせてコストを論理的にグループ化する機能。", examTip: "「コストをビジネス構造（プロジェクトやチーム）に合わせて分類・グループ化する」がキーワード。" },
+
+    { term: "Amazon FSx", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "Windowsや高負荷な計算用の「高性能な共有フォルダ」をクラウド上で簡単に使えるサービス。", intermediateDesc: "サードパーティーの高性能なファイルシステム（Windows File ServerやLustreなど）をフルマネージドで提供するストレージサービス。", examTip: "「Windows互換の共有ストレージ」「Lustreを使用した高性能コンピューティング（HPC）用ストレージ」がキーワード。" },
+    { term: "AWS Wavelength", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "5Gのスマートフォンや機器に、超高速でデータを届けるために、携帯会社のネットワークの中にAWSを置くサービス。", intermediateDesc: "5GネットワークのエッジでAWSのコンピューティングおよびストレージサービスを提供し、モバイルデバイス向けに超低レイテンシーなアプリを実現するインフラ。", examTip: "「5Gネットワーク」「モバイルデバイスへの超低レイテンシー（ミリ秒単位）のアクセス」がキーワード。" },
+    { term: "VMware Cloud on AWS", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "オンプレミス（自社）で使っているVMwareという仮想化システムを、そのままの操作感でAWS上でも使えるようにするサービス。", intermediateDesc: "オンプレミスのVMware vSphere環境をAWSクラウド上にシームレスに拡張・移行できる統合ハイブリッドクラウドサービス。", examTip: "「VMware環境をそのままAWSに移行（リフト）する」「オンプレミスと同じVMwareツールを使用する」がキーワード。" },
+    { term: "Amazon Bedrock", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "様々なAI企業が作った「生成AI（文章や画像を自動で作るAI）」のモデルを、AWS上で簡単に選んで使えるサービス。", intermediateDesc: "様々なAIプロバイダーの高性能な基盤モデル (FM) を、単一の API を通じて選択・利用できるフルマネージド型の生成AIサービス。", examTip: "「基盤モデル (FM)」「生成AIアプリケーションの構築」「単一のAPIで複数のAIモデルを選択」がキーワード。" },
+    { term: "Amazon Q", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "AWSのことなら何でも知っている、開発者やビジネスパーソン向けの賢いAIアシスタント。", intermediateDesc: "開発、ITオペレーション、ビジネスにおいて、ユーザーの質問への回答、コードの生成などをサポートする生成AI搭載アシスタント。", examTip: "「生成AIを搭載したエンタープライズ向けアシスタント」「ビジネスデータやAWSアーキテクチャの質問に答える」がキーワード。" },
+    { term: "Amazon OpenSearch Service", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "大量のログデータから特定の文字を探し出したり、Webサイトの検索窓の機能を簡単に作れる検索エンジン。", intermediateDesc: "ログ分析、リアルタイムのアプリケーション監視、ウェブサイト検索のための、スケーラブルなオープンソース互換の検索・分析スイート（旧Elasticsearch）。", examTip: "「ログ分析」「ウェブサイトの検索機能」「Elasticsearch互換」がキーワード。" },
+    { term: "Amazon WorkSpaces", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "クラウド上にある「自分専用のWindowsやLinuxのパソコン」を、手元のどんな端末からでも遠隔操作できるサービス。", intermediateDesc: "あらゆるデバイスからアクセス可能な、安全で信頼性の高いフルマネージド型のクラウドデスクトップ (DaaS) サービス。", examTip: "「クラウドベースの仮想デスクトップ (DaaS)」「リモートワーカーへのセキュアなデスクトップ環境の提供」がキーワード。" },
+    { term: "Amazon AppStream 2.0", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "パソコン全体ではなく、「特定のソフト（ExcelやCADなど）」だけをクラウドで動かして、画面だけを手元の端末に映し出すサービス。", intermediateDesc: "デスクトップアプリケーションを任意のコンピューターに安全に配信（ストリーミング）する、フルマネージド型のアプリケーションストリーミングサービス。", examTip: "WorkSpaces（デスクトップ全体）との違いに注意。「特定のデスクトップアプリケーションのみをストリーミング配信する」がキーワード。" },
+    { term: "AWS Amplify", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "スマホアプリやWebサイトを作る時に、ユーザー認証やデータベースなどの裏側の仕組みを、サクッと簡単にくっつけられる開発ツール。", intermediateDesc: "フロントエンドのウェブ・モバイル開発者が、安全でスケーラブルなフルスタックアプリケーションを迅速かつ簡単に構築できるサービスとツールのセット。", examTip: "「フロントエンド開発者向け」「ウェブ/モバイルアプリの迅速な構築とバックエンド連携」がキーワード。" },
+    { term: "AWS Device Farm", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "自分が作ったスマホアプリが、色々な種類のスマホ（iPhoneやAndroidの実機）で正しく動くか、クラウド上でテストできるサービス。", intermediateDesc: "多数の実際のモバイルデバイス（実機）を使用して、Android、iOS、ウェブアプリケーションを並行してテストできるアプリケーションテストサービス。", examTip: "「複数のモバイルデバイス（実機）でのアプリケーションテスト」がキーワード。" },
+    { term: "AWS IoT Core", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "数百万台のセンサーや家電（IoTデバイス）を、インターネット経由で安全にAWSにつなぎ、データをやり取りするための入り口。", intermediateDesc: "インターネットに接続されたデバイス（IoTデバイス）を、AWSのクラウドサービスや他のデバイスに安全かつ簡単に接続・操作するためのマネージドクラウドサービス。", examTip: "「IoTデバイスのクラウドへの安全な接続」「何十億ものデバイスからのメッセージ処理」がキーワード。" },
+    { term: "AWS IoT Greengrass", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "インターネットが繋がりにくい場所でも、センサーなどの機械（エッジデバイス）の側でデータを処理できるようにするソフトウェア。", intermediateDesc: "デバイス上でローカルにデータの生成や処理を行いながら、クラウド上で管理・分析を行えるようにするIoTエッジランタイムおよびクラウドサービス。", examTip: "「IoTデバイスでのローカルコンピューティング（エッジ処理）」「オフラインでのデバイス動作」がキーワード。" },
+    { term: "AWS Schema Conversion Tool (SCT)", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "OracleからMySQLなど、種類の違うデータベースに引っ越しする時、設計図（スキーマ）を自動で翻訳してくれる便利なツール。", intermediateDesc: "異種のデータベースを移行する際、ソースデータベースのスキーマやコードを、ターゲットのデータベースと互換性のある形式に自動的に変換するツール。", examTip: "DMS（データの移行）とセットで出題されます。「異種データベース間のスキーマ（構造）の変換」がキーワード。" },
+    { term: "Amazon Pinpoint", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "ユーザーの行動に合わせて、「セールのお知らせ」などのメールやSMS（プッシュ通知）を、最適なタイミングで送るマーケティングツール。", intermediateDesc: "顧客の行動データを活用して、SMS、Eメール、プッシュ通知などのチャネルを通じて、ターゲットを絞ったパーソナライズされたメッセージを配信するサービス。", examTip: "「マルチチャネルのマーケティングキャンペーン」「ターゲットを絞ったプッシュ通知やSMSの配信」がキーワード。" },
+    { term: "Amazon Simple Email Service (SES)", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "会員登録の完了メールやメルマガなど、大量のメールを確実に、そして安く送受信するためのサービス。", intermediateDesc: "アプリケーション内から確実かつコスト効果の高い方法で大量のEメールを送信および受信するための、クラウドベースのEメールプロバイダー。", examTip: "「アプリケーションからのバルク（大量）EメールやトランザクションEメールの送受信」がキーワード。" },
+    { term: "AWS Elastic Disaster Recovery (DRS)", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "万が一の大規模なシステム障害（災害）に備えて、データを安全な場所に常にコピーしておき、いざという時に素早くシステムを復活させるサービス。", intermediateDesc: "オンプレミスやクラウドベースのアプリケーションを、AWS上で迅速に復旧できるように継続的にレプリケーション（複製）する、災害対策 (DR) サービス。", examTip: "「ランサムウェア対策や自然災害時の迅速な復旧」「継続的なデータレプリケーションによるRPO/RTOの最小化」がキーワード。" },
+    { term: "AWS Data Exchange", domain: "第3分野: クラウドテクノロジーとサービス", beginnerDesc: "株価データや気象データなど、他の会社が売っている「便利なデータ」をAWS上で買って、すぐに自分の分析に使えるデータ市場。", intermediateDesc: "クラウド内でサードパーティーのデータを簡単に検索、サブスクライブ、使用できるようにするサービス。", examTip: "「サードパーティーデータの検索とサブスクライブ」「データプロバイダーからのデータ取得」がキーワード。" },
+    { term: "AWS License Manager", domain: "第4分野: 請求、料金、サポート", beginnerDesc: "会社が持っている「ソフトウェアのライセンス（利用権利）」を使いすぎて契約違反にならないよう、AWS上で自動で監視・管理してくれるサービス。", intermediateDesc: "MicrosoftやOracleなどのソフトウェアベンダーのライセンスを、AWSおよびオンプレミス環境全体で簡単に管理・適用・追跡できるサービス。", examTip: "「既存のソフトウェアライセンスの持ち込み（BYOL）の管理」「ライセンス違反の防止」がキーワード。" },
+    { term: "AWS Network Firewall", domain: "第2分野: セキュリティとコンプライアンス", beginnerDesc: "VPC（自分専用のネットワーク）全体を守るための、高度なセキュリティチェックができる強力なファイアウォール（防火壁）。", intermediateDesc: "すべてのAmazon VPCに不可欠なネットワーク保護を簡単にデプロイできる、スケーラブルな高可用性マネージドネットワークファイアウォールサービス。", examTip: "WAF（Webアプリ用）との違いに注意。「VPC全体のトラフィックに対する高度なパケットフィルタリングと侵入防御 (IPS)」がキーワード。" },
+    { term: "AWS Billing Conductor", domain: "第4分野: 請求、料金、サポート", beginnerDesc: "「この部署にはこの料金を見せる」など、AWSの請求書の見た目や計算方法を、会社ごとの独自のルールに合わせてカスタマイズできるサービス。", intermediateDesc: "組織のビジネス構造に合わせて請求データをカスタマイズし、特定のチームや顧客向けにプロフォーマ（見積）請求書を作成できるサービス。", examTip: "「請求とコストのレポート構造をビジネス要件に合わせてカスタマイズする」「プロフォーマ（見積）請求書の作成」がキーワード。" }
+
+
+
 ];
 
 const ROADMAP_DATA = [
@@ -1118,8 +1173,14 @@ function QuizView({ quizPool, setQuizPool, usedQuizIds, setUsedQuizIds, stats, u
 
     const currentItem = sessionHistory[currentIndex];
     const currentQuiz = currentItem ? currentItem.quiz : null;
-    const selectedOption = currentItem ? currentItem.selectedOption : null;
-    const isAnswered = selectedOption !== null && selectedOption !== undefined;
+    
+    // 単一・複数選択両対応のためのステート管理
+    const selectedOptions = currentItem ? (currentItem.selectedOptions || []) : [];
+    const isAnswered = currentItem ? !!currentItem.isAnswered : false;
+    
+    // 互換性吸収用ヘルパー（古い単一選択データが来た場合のフォールバック）
+    const actualAnswerIndices = currentQuiz ? (currentQuiz.answerIndices || [currentQuiz.answerIndex]) : [];
+    const actualType = currentQuiz ? (currentQuiz.type || 'single') : 'single';
 
     useEffect(() => {
         setSelectedTask('all');
@@ -1140,23 +1201,29 @@ function QuizView({ quizPool, setQuizPool, usedQuizIds, setUsedQuizIds, stats, u
                 const nextQuiz = targetPool[Math.floor(Math.random() * targetPool.length)];
                 setSessionHistory(prev => {
                     const newHistory = [...prev];
-                    newHistory[currentIndex] = { quiz: nextQuiz, selectedOption: null };
+                    newHistory[currentIndex] = { quiz: nextQuiz, selectedOptions: [], isAnswered: false };
                     return newHistory;
                 });
             }
         }
     }, [currentQuiz, currentIndex, selectedDomain, selectedTask, quizPool, usedQuizIds]);
 
-    const handleOptionClick = (idx) => {
-        if (isAnswered || !currentQuiz) return;
-        
+    const processAnswer = (selectedArray) => {
+        if (isAnswered) return;
+
         setSessionHistory(prev => {
             const newHistory = [...prev];
-            newHistory[currentIndex] = { ...newHistory[currentIndex], selectedOption: idx };
+            newHistory[currentIndex] = { ...newHistory[currentIndex], selectedOptions: selectedArray, isAnswered: true };
             return newHistory;
         });
 
-        const isCorrect = idx === currentQuiz.answerIndex;
+        // 正誤判定ロジック
+        let isCorrect = false;
+        if (actualType === 'multiple') {
+            isCorrect = selectedArray.length === actualAnswerIndices.length && selectedArray.every(val => actualAnswerIndices.includes(val));
+        } else {
+            isCorrect = selectedArray[0] === actualAnswerIndices[0];
+        }
 
         const newStats = { ...stats };
         newStats.totalAnswered += 1;
@@ -1183,6 +1250,37 @@ function QuizView({ quizPool, setQuizPool, usedQuizIds, setUsedQuizIds, stats, u
 
         updateStats(newStats);
         setUsedQuizIds(prev => [...prev, currentQuiz.id]);
+    };
+
+    const handleOptionClick = (idx) => {
+        if (isAnswered || !currentQuiz) return;
+        
+        if (actualType === 'multiple') {
+            // 複数選択問題：トグル動作（最大2つまで）
+            setSessionHistory(prev => {
+                const newHistory = [...prev];
+                const current = newHistory[currentIndex];
+                let newOptions = [...(current.selectedOptions || [])];
+                
+                if (newOptions.includes(idx)) {
+                    newOptions = newOptions.filter(i => i !== idx);
+                } else if (newOptions.length < 2) {
+                    newOptions.push(idx);
+                }
+                
+                newHistory[currentIndex] = { ...current, selectedOptions: newOptions };
+                return newHistory;
+            });
+        } else {
+            // 択一問題：クリック即解答
+            processAnswer([idx]);
+        }
+    };
+
+    const handleConfirmMultiple = () => {
+        if (selectedOptions.length === 2) {
+            processAnswer(selectedOptions);
+        }
     };
 
     const handleNext = () => {
@@ -1228,43 +1326,53 @@ function QuizView({ quizPool, setQuizPool, usedQuizIds, setUsedQuizIds, stats, u
                 taskInstruction = `【最重要指示】特定のサービスに偏らないようにするため、今回は以下のタスクテーマに沿った問題を必ず作成してください。\n指定タスク: ${targetTaskLabels}\ntask_idフィールドには該当するタスクIDを正確に設定してください。`;
             }
 
+            // --- ここから追加：解決策A (単語カード連携による出題の偏り防止) ---
+            let keywordInstruction = "";
+            // タスク絞り込みがない場合のみ、単語カードからの抽出を行う（タスクとキーワードの矛盾によるエラーを防ぐため）
+            if (selectedTask === 'all') {
+                let targetCards = FLASHCARDS;
+                if (selectedDomain !== 'all') {
+                    targetCards = targetCards.filter(c => c.domain === selectedDomain);
+                }
+                if (targetCards.length > 0) {
+                    const shuffledCards = [...targetCards].sort(() => 0.5 - Math.random());
+                    const selectedTerms = shuffledCards.slice(0, count).map(c => c.term);
+                    keywordInstruction = `\n【出題ターゲットの強制】\nいつも同じメジャーなサービス（S3やEC2など）ばかりが出題されるのを防ぐため、今回は必ず以下のAWSサービス・概念をメインテーマ（または正解）とした問題を作成してください。\n指定用語リスト: ${selectedTerms.join(", ")}`;
+                }
+            }
+            // --- ここまで追加 ---
+
             let difficultyInstruction = "";
             if (difficulty === '初級') {
                 difficultyInstruction = `【難易度：初級 の作成ルール】
-目的：AWSの基本的な用語、サービス、概念の「定義」を正確に理解しているかを問う。
-- 問題文の型: 以下の2つのパターンのいずれかで作成してください。
+目的：AWSサービスの最も基本的な定義を、一問一答形式で問う。
+- 問題文の制約: シナリオ（架空の企業などの設定）は一切禁止。必ず以下の2つのパターンのいずれかで1〜2文で簡潔に作成すること。
   パターンA: 「〜〜を提供するAWSサービスはどれですか？」(機能からサービス名を問う)
-  パターンB: 「[AWSサービス名]を正しく説明しているのはどれですか？」(サービス名から機能を問う)
-- 選択肢の型: 
-  パターンAの場合は、単一のサービス名（例：Amazon S3）のみで構成してください。
-  パターンBの場合は、「[AWSサービス名]は、〜〜するためのサービスである」といった簡潔な説明文で構成してください。
-- 複雑なシナリオや架空の企業名は一切使用しないでください。
-- 不正解の条件: 全く関係ないサービスではなく、初心者や未経験者が混同しやすい類似サービス（例：S3とEBS、EC2とLambda、IAMとCognitoなど）や、その説明文を配置してください。`;
+  パターンB: 「[AWSサービス名]を正しく説明しているのはどれですか？」(サービス名から機能の文章を問う)
+- ダミー選択肢の制約（易しめ）: 過度に紛らわしい類似サービス（S3とEBSなど）でひっかけることは避け、明らかに用途が異なるサービス（例：ストレージの問題なら、ダミーにEC2やRDSを混ぜる）を配置すること。`;
             } else if (difficulty === '中級') {
                 difficultyInstruction = `【難易度：中級 の作成ルール】
-目的：AWS認定クラウドプラクティショナーの「本番試験の標準レベル」を完全に再現する。
-- 問題文の型: 以下の2つのパターンのいずれかを作成してください。どちらのパターンでも、必ず「ある企業が〜」「あるスタートアップが〜」から始まる架空のユースケース（シナリオ）にしてください。
-  パターンA: 「（課題・要件のシナリオ）最適なAWSサービスはどれですか？」(シナリオから最適なサービス名を問う)
-  パターンB: 「（課題・要件のシナリオ）この課題を解決するために [特定のAWSサービス名] の導入を検討しています。このサービスが要件を満たす理由として最も適切な説明はどれですか？」(シナリオにおいて特定のサービスが適している理由・機能を問う)
-- 選択肢の型: 
-  パターンAの場合は、単一のサービス名としてください。
-  パターンBの場合は、そのサービスの具体的な機能やメリットを説明する文章（例：「〇〇を自動化し、運用負荷を下げるから」等）としてください。
-- 要件の提示: 問題文の中には、解決すべき課題や要件（例：「初期費用を抑えたい」「ミリ秒単位の応答が必要」など）を明確に1〜2つ提示してください。
-- 巧妙な不正解（最重要）: 選択肢の中には、「問題文の要件の一部は満たすが、別の要件（例：コスト、データ構造、運用負荷など）を満たさないために不正解となる内容（または実在のAWSサービス）」を必ず含め、受験者が深く考えないと正解できないようにしてください。`;
+目的：本番試験で最も多く出題される「単一の要件を持つシンプルなシナリオ問題」を再現する。
+- 問題文の制約: 「ある企業が〜」といった短いシナリオ形式とし、「要件・課題は1つだけ」（例：コストを下げたい）に絞ること。解答に不要な背景説明は一切省き、3行以内に収めること。必ず以下の2つのパターンのいずれかで作成すること。
+  パターンA: 「（課題のシナリオ）最適なAWSサービスはどれですか？」(要件から最適なサービス名を問う)
+  パターンB: 「（課題のシナリオ）この課題解決のために [特定のAWSサービス名] の導入を検討しています。要件を満たす理由として最も適切なものはどれですか？」(シナリオにおいてそのサービスが選ばれる理由を問う)
+- ダミー選択肢の制約（標準的）: 「正解ではないが、同じ分野の類似サービス」をダミーにすること。ただし、深読みしないと解けないような巧妙なひっかけ（コスト面だけで落とす等）は禁止する。`;
             } else {
                 difficultyInstruction = `【難易度：上級 の作成ルール】
-目的：本番試験において、合格ラインを分ける「難易度の高いシナリオ問題」を再現する。
-- 問題文の要件: シナリオの中に、「複数の制約」を設けてください。（例：「高い可用性を維持しつつ、運用オーバーヘッド（管理の手間）を最小限に抑えたい」「オンプレミス環境とクラウドを安全に接続し、かつ数テラバイトのデータを移行したい」など）
-- ベストプラクティスの適用: 「運用上の優秀性」や「コスト最適化」「最小権限の原則」など、AWSのベストプラクティスを理解していないと解けない内容にしてください。
-- 選択肢の型（アクションベース）: 単にサービス名を並べるのではなく、「どう行動するか（例：Amazon S3 にデータを保存し、Amazon Athena でクエリを実行する）」や「どう設定するか（例：AWS Organizations を使用して SCP を適用し、ルートアカウントを保護する）」といった、具体的なアクションを含んだ文章の選択肢を作成してください。
-- ひっかけの指示: 不正解の選択肢には、「技術的には可能だが、コストが非効率すぎるもの」や「技術的には可能だが、運用管理の手間がかかりすぎる（マネージドサービスを活用していない）もの」を含めてください。`;
+目的：本番試験で合否を分ける「複数の要件を持つシナリオ問題」を再現する。
+- 問題文の制約: 短いシナリオ形式とし、「要件・課題を2つ以上」（例：高可用性を維持しつつ、コストを最小限に抑えたい）設定すること。解答に不要な背景説明は一切省き、3行以内に収めること。必ず以下の2つのパターンのいずれかで作成すること。
+  パターンA: 「（複数要件のシナリオ）最適なAWSサービスはどれですか？」
+  パターンB: 「（複数要件のシナリオ）この課題解決のために [特定のAWSサービス名] の導入を検討しています。要件を満たす理由として最も適切なものはどれですか？」
+- ダミー選択肢の制約（巧妙なひっかけ必須）: パターンA・Bともに、以下のいずれかの巧妙なダミーを必ず含めること。
+  1. 要件の1つ目は満たすが、2つ目は満たさないもの。
+  2. 技術的には実現可能だが、ベストプラクティスから外れる（コストが高すぎる、管理の手間がかかりすぎる）やり方。`;
             }
 
             const systemPrompt = `あなたはAWS認定クラウドプラクティショナー(CLF-C02)の試験問題作成プロフェッショナルです。
 模擬テストを${count}問作成してください。難易度は「${difficulty}」です。
 
 【ベースとなる厳格な制約（必ず守ること）】
-1. 範囲の厳格化: CLF-C02の試験範囲に限定すること。深いアーキテクチャ設計や、コーディングの知識を問うアソシエイトレベル以上の問題は絶対に作成しないこと。
+1. 範囲の厳格化: CLF-C02の試験範囲に限定すること。
 2. 架空のサービス禁止: 選択肢に架空のサービス名は絶対に作成せず、すべて実在する公式のAWSサービスを使用すること。
 3. 積極的なキーワード使用: 問題文には試験頻出の用語（プロビジョニング、マネージド、弾力性、高可用性、スケーラビリティ、オンプレミスなど）を積極的に組み込むこと。
 4. 解説のフォーマット: 長文を避け、必ず以下の形式で「見出し」と「箇条書き」を使って出力すること。
@@ -1272,15 +1380,23 @@ function QuizView({ quizPool, setQuizPool, usedQuizIds, setUsedQuizIds, stats, u
 （正解となる理由を記載）
 【不正解の理由】
 ・[不正解の選択肢名]: （間違いである理由を記載）
-・[不正解の選択肢名]: （間違いである理由を記載）
-・[不正解の選択肢名]: （間違いである理由を記載）
+5. 問題文の簡潔さ（最重要）: 問題文は本番試験を模倣し、極力短く簡潔にすること。解答を導くために不要な背景説明（架空の企業の業種、規模、歴史など）は一切書かず、技術的な要件や課題のみを端的に1〜3行以内で記載すること。
+
+【出題形式（重要）】
+問題は「択一選択問題（4つの選択肢から1つ正解を選ぶ）」と、「複数選択問題（5つの選択肢から2つ正解を選ぶ）」を混ぜて作成してください。
+作成する${count}問のうち、およそ2割〜3割を複数選択問題(type: "multiple")にしてください。
 
 ${difficultyInstruction}
 
 【データフォーマット】
 出力は必ず以下のJSONスキーマに従う配列形式にしてください。
+- typeフィールドには、択一の場合は "single"、複数選択の場合は "multiple" を指定してください。
+- 択一の場合、optionsは4つ、answerIndicesは正解のインデックスを1つ含む配列（例: [0]）にしてください。
+- 複数選択の場合、optionsは必ず5つ、answerIndicesは正解のインデックスを2つ含む配列（例: [1, 3]）にしてください。
+
 ${domainInstruction}
 ${taskInstruction}
+${keywordInstruction}
 `;
             const payload = {
                 contents: [{ parts: [{ text: `CLF-C02の模擬テストを作成してください（${count}問、難易度：${difficulty}）` }] }],
@@ -1295,12 +1411,13 @@ ${taskInstruction}
                             properties: {
                                 question: { type: "STRING" },
                                 options: { type: "ARRAY", items: { type: "STRING" } },
-                                answerIndex: { type: "INTEGER" },
+                                type: { type: "STRING", description: "択一選択は'single', 複数選択は'multiple'" },
+                                answerIndices: { type: "ARRAY", items: { type: "INTEGER" } },
                                 explanation: { type: "STRING" },
                                 domain: { type: "STRING" },
                                 task_id: { type: "STRING", description: "関連するタスクID（例: '1.1', '2.3'）" }
                             },
-                            required: ["question", "options", "answerIndex", "explanation", "domain", "task_id"]
+                            required: ["question", "options", "type", "answerIndices", "explanation", "domain", "task_id"]
                         }
                     }
                 }
@@ -1313,24 +1430,27 @@ ${taskInstruction}
             
             const json = JSON.parse(text);
             const newQuizzes = json.map(q => {
-                // --- 選択肢の強制シャッフル処理 ---
+                // シャッフル前の正解テキストを保持
                 const originalOptions = [...q.options];
-                const correctAnswerText = originalOptions[q.answerIndex]; // 元の正解のテキストを記憶
+                const baseIndices = q.answerIndices || (q.answerIndex !== undefined ? [q.answerIndex] : []);
+                const correctAnswerTexts = baseIndices.map(idx => originalOptions[idx]);
                 
+                // 選択肢のシャッフル
                 const shuffledOptions = [...originalOptions];
-                // Fisher-Yatesアルゴリズムで配列をシャッフル
                 for (let i = shuffledOptions.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [shuffledOptions[i], shuffledOptions[j]] = [shuffledOptions[j], shuffledOptions[i]];
                 }
                 
-                // シャッフル後の配列から、記憶しておいた正解のテキストを探して新しいインデックスを取得
-                const newAnswerIndex = shuffledOptions.indexOf(correctAnswerText);
+                // シャッフル後の正解インデックスを特定
+                const newAnswerIndices = correctAnswerTexts.map(text => shuffledOptions.indexOf(text)).filter(idx => idx !== -1);
+                const finalIndices = newAnswerIndices.length === baseIndices.length ? newAnswerIndices : baseIndices;
 
                 return {
                     ...q, 
                     options: shuffledOptions,
-                    answerIndex: newAnswerIndex !== -1 ? newAnswerIndex : q.answerIndex, // 安全策として見つからなければ元のまま
+                    answerIndices: finalIndices,
+                    type: q.type || 'single',
                     id: crypto.randomUUID(),
                     domain: selectedDomain !== 'all' ? selectedDomain : q.domain,
                     task_id: selectedTask !== 'all' ? selectedTask : q.task_id
@@ -1431,6 +1551,11 @@ ${taskInstruction}
                                 <span className={`inline-block px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full font-semibold mb-4 border border-gray-200 dark:border-gray-600 transition-colors ${textClasses.sm}`}>
                                     {currentQuiz.domain} {currentQuiz.task_id && `- タスク ${currentQuiz.task_id}`}
                                 </span>
+                                {actualType === 'multiple' && (
+                                    <span className={`inline-block ml-0 mt-2 md:mt-0 md:ml-2 px-3 py-1 bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 rounded-full font-bold mb-4 border border-amber-200 dark:border-amber-800 transition-colors ${textClasses.sm}`}>
+                                        ※2つ選択してください
+                                    </span>
+                                )}
                                 <h3 className={`font-bold leading-relaxed ${textClasses.xl}`}>{currentQuiz.question}</h3>
                             </div>
                             <span className={`text-gray-400 dark:text-gray-500 font-bold shrink-0 mt-4 md:mt-0 ${textClasses.sm}`}>Q. {currentIndex + 1}</span>
@@ -1438,21 +1563,31 @@ ${taskInstruction}
 
                         <div className="space-y-3">
                             {currentQuiz.options.map((opt, idx) => {
-                                const isSelected = selectedOption === idx;
-                                const isCorrect = idx === currentQuiz.answerIndex;
+                                const isSelected = selectedOptions.includes(idx);
+                                const isCorrect = actualAnswerIndices.includes(idx);
+                                
                                 let btnClass = "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300 dark:hover:border-blue-500";
+                                
                                 if (isAnswered) {
                                     if (isCorrect) btnClass = "bg-green-50 dark:bg-green-900/30 border-green-500 text-green-900 dark:text-green-100 font-medium";
                                     else if (isSelected && !isCorrect) btnClass = "bg-red-50 dark:bg-red-900/30 border-red-400 text-red-900 dark:text-red-100";
                                     else btnClass = "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 opacity-50";
+                                } else if (isSelected) {
+                                    // 複数選択用の「選択中」ハイライト
+                                    btnClass = "bg-blue-50 dark:bg-blue-900/30 border-blue-400 dark:border-blue-500 text-blue-900 dark:text-blue-100 ring-2 ring-blue-500/20";
                                 }
+
                                 return (
                                     <button
                                         key={idx} onClick={() => handleOptionClick(idx)} disabled={isAnswered}
                                         className={`w-full text-left p-3 md:p-4 rounded-xl border-2 transition-all flex items-start ${btnClass} ${textClasses.base}`}
                                     >
-                                        <span className="shrink-0 inline-block w-8 font-bold text-gray-400 dark:text-gray-500">{String.fromCharCode(65 + idx)}.</span>
-                                        <span className="flex-1">{opt}</span>
+                                        <span className="shrink-0 inline-block w-8 font-bold text-gray-400 dark:text-gray-500">
+                                            {actualType === 'multiple' 
+                                                ? (isSelected ? <CheckSquare className="w-5 h-5 text-blue-500 mr-2 inline" /> : <Square className="w-5 h-5 text-gray-400 mr-2 inline" />)
+                                                : String.fromCharCode(65 + idx) + "."}
+                                        </span>
+                                        <span className="flex-1 ml-1">{opt}</span>
                                         {isAnswered && isCorrect && <CheckCircle className="w-6 h-6 text-green-500 shrink-0 ml-2" />}
                                         {isAnswered && isSelected && !isCorrect && <XCircle className="w-6 h-6 text-red-400 dark:text-red-500 shrink-0 ml-2" />}
                                     </button>
@@ -1460,37 +1595,79 @@ ${taskInstruction}
                             })}
                         </div>
 
-                        {!isAnswered && currentIndex > 0 && (
+                        {!isAnswered && actualType === 'multiple' && (
+                            <div className="mt-6 flex justify-end">
+                                <button 
+                                    onClick={handleConfirmMultiple}
+                                    disabled={selectedOptions.length !== 2}
+                                    className={`px-6 py-3 rounded-xl font-bold flex items-center shadow-sm transition ${selectedOptions.length === 2 ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'} ${textClasses.base}`}
+                                >
+                                    解答を確定する
+                                </button>
+                            </div>
+                        )}
+
+                        {!isAnswered && currentIndex > 0 && actualType !== 'multiple' && (
                             <div className="mt-6 flex justify-start">
                                 <button onClick={handlePrev} className={`px-5 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 font-bold flex items-center shadow-sm transition ${textClasses.base}`}>
                                     <ChevronLeft className="mr-1 w-5 h-5" /> 前の問題に戻る
                                 </button>
                             </div>
                         )}
+                        {!isAnswered && currentIndex > 0 && actualType === 'multiple' && (
+                            <div className="mt-6 flex justify-start">
+                                <button onClick={handlePrev} className={`px-5 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 font-bold flex items-center shadow-sm transition ${textClasses.base}`}>
+                                    <ChevronLeft className="mr-1 w-5 h-5" /> 戻る
+                                </button>
+                            </div>
+                        )}
 
                         {isAnswered && (
                             <div className="mt-8 animate-in fade-in slide-in-from-top-4 duration-300">
-                                <div className={`p-4 md:p-5 rounded-xl border transition-colors ${selectedOption === currentQuiz.answerIndex ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'}`}>
+                                <div className={`p-4 md:p-5 rounded-xl border transition-colors ${
+                                    (actualType === 'multiple' ? (selectedOptions.length === actualAnswerIndices.length && selectedOptions.every(val => actualAnswerIndices.includes(val))) : selectedOptions[0] === actualAnswerIndices[0])
+                                    ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' 
+                                    : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                                }`}>
                                     <div className="flex items-center mb-3">
-                                        {selectedOption === currentQuiz.answerIndex ? (
-                                            <><CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400 mr-2" /> <span className={`font-bold text-green-800 dark:text-green-300 ${textClasses.lg}`}>正解！</span></>
-                                        ) : (
-                                            <><XCircle className="w-6 h-6 text-red-600 dark:text-red-400 mr-2" /> <span className={`font-bold text-red-800 dark:text-red-300 ${textClasses.lg}`}>不正解</span></>
-                                        )}
+                                        {(() => {
+                                            const allCorrect = actualType === 'multiple' 
+                                                ? (selectedOptions.length === actualAnswerIndices.length && selectedOptions.every(val => actualAnswerIndices.includes(val)))
+                                                : (selectedOptions[0] === actualAnswerIndices[0]);
+                                            
+                                            return allCorrect ? (
+                                                <><CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400 mr-2" /> <span className={`font-bold text-green-800 dark:text-green-300 ${textClasses.lg}`}>正解！</span></>
+                                            ) : (
+                                                <><XCircle className="w-6 h-6 text-red-600 dark:text-red-400 mr-2" /> <span className={`font-bold text-red-800 dark:text-red-300 ${textClasses.lg}`}>不正解</span></>
+                                            )
+                                        })()}
                                     </div>
-                                    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-100/50 dark:border-gray-700 shadow-sm transition-colors">
+                                    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-100/50 dark:border-gray-700 shadow-sm transition-colors whitespace-pre-wrap">
                                         <p className={`text-gray-500 dark:text-gray-400 font-bold mb-2 ${textClasses.sm}`}>解説:</p>
-                                        <p className={`text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap ${textClasses.base}`}>{currentQuiz.explanation}</p>
+                                        <p className={`text-gray-800 dark:text-gray-200 leading-relaxed ${textClasses.base}`}>
+                                            {currentQuiz.explanation.split(/(\*\*.*?\*\*)/g).map((part, i) => {
+                                                if (part.startsWith('**') && part.endsWith('**')) {
+                                                    return (
+                                                        <strong key={i} className="inline-flex items-center px-2 py-0.5 mx-0.5 my-0.5 rounded-md border font-bold text-[0.95em] shadow-sm align-baseline transition-colors bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/40 dark:border-blue-700 dark:text-blue-300">
+                                                            {part.slice(2, -2)}
+                                                        </strong>
+                                                    );
+                                                }
+                                                return <span key={i}>{part}</span>;
+                                            })}
+                                        </p>
                                     </div>
                                 </div>
 
                                 <div className="mt-4 flex justify-end">
                                     <button 
                                         onClick={() => {
-                                            const isCorrect = selectedOption === currentQuiz.answerIndex;
-                                            const userAnswer = currentQuiz.options[selectedOption];
-                                            const correctAnswer = currentQuiz.options[currentQuiz.answerIndex];
-                                            const message = `先ほど模擬テストで解いた以下の問題について質問があります。もう少し詳しく教えてください。\n\n【問題】\n${currentQuiz.question}\n\n【正解】\n${correctAnswer}\n\n【自分の回答】\n${userAnswer} (${isCorrect ? '正解' : '不正解'})\n\n【解説】\n${currentQuiz.explanation}`;
+                                            const allCorrect = actualType === 'multiple' 
+                                                ? (selectedOptions.length === actualAnswerIndices.length && selectedOptions.every(val => actualAnswerIndices.includes(val)))
+                                                : (selectedOptions[0] === actualAnswerIndices[0]);
+                                            const userAnswerText = selectedOptions.map(idx => currentQuiz.options[idx]).join(' / ');
+                                            const correctAnswerText = actualAnswerIndices.map(idx => currentQuiz.options[idx]).join(' / ');
+                                            const message = `先ほど模擬テストで解いた以下の問題について質問があります。もう少し詳しく教えてください。\n\n【問題】\n${currentQuiz.question}\n\n【正解】\n${correctAnswerText}\n\n【自分の回答】\n${userAnswerText} (${allCorrect ? '正解' : '不正解'})\n\n【解説】\n${currentQuiz.explanation}`;
                                             onAskTutor(message);
                                         }}
                                         className={`px-4 py-2.5 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/50 border border-purple-200 dark:border-purple-800/50 rounded-xl font-bold flex items-center shadow-sm transition-colors ${textClasses.sm}`}
