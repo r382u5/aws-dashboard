@@ -351,6 +351,13 @@ const ROADMAP_DATA = [
     }
 ];
 
+const getInitialTextSize = () => {
+    if (typeof window !== 'undefined') {
+        return window.innerWidth < 768 ? 'sm' : 'md';
+    }
+    return 'md';
+};
+
 const initialStats = {
     totalAnswered: 0,
     correctAnswers: 0,
@@ -362,7 +369,7 @@ const initialStats = {
     }, {}),
     dailyStats: {},
     roadmapProgress: [],
-    settings: { textSize: 'md', theme: 'dark' },
+    settings: { textSize: getInitialTextSize(), theme: 'dark' },
     examDate: null, 
     tutorHistory: {
         guide: [
