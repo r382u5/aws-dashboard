@@ -976,37 +976,37 @@ function DashboardView({ stats, updateStats, setUsedQuizIds, textClasses, userAp
                         <div className="flex flex-col md:flex-row md:items-center gap-6">
                             
                             <div className="flex items-center gap-3">
-                                <span className={`font-medium text-gray-700 dark:text-gray-300 ${textClasses.base}`}>テーマ:</span>
-                                <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                                <span className={`font-medium text-gray-700 dark:text-gray-300 shrink-0 ${textClasses.base}`}>テーマ:</span>
+                                <div className="flex flex-wrap gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
                                     <button
                                         onClick={() => handleThemeChange('light')}
-                                        className={`px-4 py-2 rounded-md transition flex items-center gap-2 ${textClasses.sm} ${currentTheme === 'light' ? 'bg-white dark:bg-gray-600 shadow-sm font-bold text-blue-600 dark:text-blue-300' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                        className={`px-3 sm:px-4 py-2 rounded-md transition flex items-center gap-2 whitespace-nowrap ${textClasses.sm} ${currentTheme === 'light' ? 'bg-white dark:bg-gray-600 shadow-sm font-bold text-blue-600 dark:text-blue-300' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
                                     >
-                                        <Sun className="w-4 h-4" /> ライト
+                                        <Sun className="w-4 h-4 shrink-0" /> ライト
                                     </button>
                                     <button
                                         onClick={() => handleThemeChange('dark')}
-                                        className={`px-4 py-2 rounded-md transition flex items-center gap-2 ${textClasses.sm} ${currentTheme === 'dark' ? 'bg-white dark:bg-gray-600 shadow-sm font-bold text-blue-600 dark:text-blue-300' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                        className={`px-3 sm:px-4 py-2 rounded-md transition flex items-center gap-2 whitespace-nowrap ${textClasses.sm} ${currentTheme === 'dark' ? 'bg-white dark:bg-gray-600 shadow-sm font-bold text-blue-600 dark:text-blue-300' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
                                     >
-                                        <Moon className="w-4 h-4" /> ダーク
+                                        <Moon className="w-4 h-4 shrink-0" /> ダーク
                                     </button>
                                     <button
                                         onClick={() => handleThemeChange('exam')}
-                                        className={`px-4 py-2 rounded-md transition flex items-center gap-2 ${textClasses.sm} ${currentTheme === 'exam' ? 'bg-white dark:bg-gray-600 shadow-sm font-bold text-blue-600 dark:text-blue-300' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                        className={`px-3 sm:px-4 py-2 rounded-md transition flex items-center gap-2 whitespace-nowrap ${textClasses.sm} ${currentTheme === 'exam' ? 'bg-white dark:bg-gray-600 shadow-sm font-bold text-blue-600 dark:text-blue-300' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
                                     >
-                                        <Monitor className="w-4 h-4" /> 本番UI
+                                        <Monitor className="w-4 h-4 shrink-0" /> 本番UI
                                     </button>
                                 </div>
                             </div>
 
                             <div className="flex items-center gap-3">
-                                <span className={`font-medium text-gray-700 dark:text-gray-300 ${textClasses.base}`}>文字サイズ:</span>
-                                <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                                <span className={`font-medium text-gray-700 dark:text-gray-300 shrink-0 ${textClasses.base}`}>文字サイズ:</span>
+                                <div className="flex flex-wrap gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
                                     {['sm', 'md', 'lg'].map(size => (
                                         <button
                                             key={size}
                                             onClick={() => handleTextSizeChange(size)}
-                                            className={`px-4 py-2 rounded-md transition ${textClasses.sm} ${stats.settings?.textSize === size ? 'bg-white dark:bg-gray-600 shadow-sm font-bold text-blue-600 dark:text-blue-300' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                            className={`px-4 py-2 rounded-md transition whitespace-nowrap ${textClasses.sm} ${stats.settings?.textSize === size ? 'bg-white dark:bg-gray-600 shadow-sm font-bold text-blue-600 dark:text-blue-300' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
                                         >
                                             {size === 'sm' ? '小' : size === 'md' ? '中' : '大'}
                                         </button>
