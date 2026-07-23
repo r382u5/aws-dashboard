@@ -5,7 +5,7 @@ import {
     XCircle, AlertCircle, BarChart3, MessageSquare, Calendar, Settings,
     Sun, Moon, Map, CheckSquare, Square, PlayCircle, Cloud,
     Info, ExternalLink, Key, Trash2, User, Bot, Sparkles, Clock,
-    Target, CalendarDays, ClipboardList, Compass
+    Target, CalendarDays, ClipboardList, Compass, Monitor
 } from 'lucide-react';
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'firebase/auth';
@@ -562,9 +562,54 @@ export default function App() {
 
     const theme = stats.settings?.theme || 'dark';
 
+    // --- 本番UIモードの事前準備 ---
+    // 他の機能に影響を与えないよう、状態の認識とルートへのクラス付与のみ行う
+    const isExamMode = theme === 'exam';
+    const rootThemeClass = theme === 'dark' ? 'dark' : (isExamMode ? 'exam-mode' : '');
+
     return (
-        <div className={`flex h-screen overflow-hidden font-sans ${theme === 'dark' ? 'dark' : ''}`}>
+        <div className={`flex h-screen overflow-hidden font-sans ${rootThemeClass}`}>
             
+            {}
+            {/* 本番UI用の強制上書きCSS（丸みを消し、フォントを無骨にし、色を黒に統一） */}
+            {isExamMode && (
+                <style dangerouslySetInnerHTML={{__html: `
+                    /* 1. フォントと文字色を強制的に黒とゴシック体に */
+                    .exam-mode, .exam-mode * {
+                        color: #111 !important;
+                        font-family: "MS UI Gothic", "ＭＳ Ｐゴシック", "Yu Gothic", sans-serif !important;
+                    }
+                    /* 2. 丸み(角丸)や影をすべて消し去り、四角くする */
+                    .exam-mode * {
+                        border-radius: 0 !important;
+                        box-shadow: none !important;
+                    }
+                    /* 3. アイコンも強制的に黒へ */
+                    .exam-mode svg {
+                        color: #111 !important;
+                    }
+                    /* 4. ボタンをテストセンター風のグレーで統一 */
+                    .exam-mode button {
+                        background-color: #e4e4e4 !important;
+                        border: 1px solid #777 !important;
+                        color: #111 !important;
+                    }
+                    .exam-mode button:hover:not(:disabled) {
+                        background-color: #d0d0d0 !important;
+                    }
+                    /* 5. 色付きの背景やプログレスバーをダークグレーに */
+                    .exam-mode .bg-blue-600, .exam-mode .bg-blue-500, .exam-mode .bg-green-500, .exam-mode .bg-gradient-to-r {
+                        background-color: #555 !important;
+                        background-image: none !important;
+                    }
+                    /* 6. 淡い色のエリアを薄いグレーに統一して本番の無機質さを演出 */
+                    .exam-mode .bg-blue-50, .exam-mode .bg-purple-50, .exam-mode .bg-green-50, .exam-mode .bg-amber-50, .exam-mode .bg-gray-100 {
+                        background-color: #f5f5f5 !important;
+                        border-color: #999 !important;
+                    }
+                `}} />
+            )}
+
             {/* Custom Dialogs */}
             <CustomDialog config={dialogConfig} onClose={closeDialog} textClasses={textClasses} />
             {showExamModal && <ExamSettingsModal stats={stats} updateStats={updateStats} onClose={() => setShowExamModal(false)} textClasses={textClasses} />}
@@ -945,6 +990,12 @@ function DashboardView({ stats, updateStats, setUsedQuizIds, textClasses, userAp
                                     >
                                         <Moon className="w-4 h-4" /> ダーク
                                     </button>
+                                    <button
+                                        onClick={() => handleThemeChange('exam')}
+                                        className={`px-4 py-2 rounded-md transition flex items-center gap-2 ${textClasses.sm} ${currentTheme === 'exam' ? 'bg-white dark:bg-gray-600 shadow-sm font-bold text-blue-600 dark:text-blue-300' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                    >
+                                        <Monitor className="w-4 h-4" /> 本番UI
+                                    </button>
                                 </div>
                             </div>
 
@@ -1211,6 +1262,8 @@ function QuizView({ quizPool, setQuizPool, usedQuizIds, setUsedQuizIds, stats, u
     // 互換性吸収用ヘルパー（古い単一選択データが来た場合のフォールバック）
     const actualAnswerIndices = currentQuiz ? (currentQuiz.answerIndices || [currentQuiz.answerIndex]) : [];
     const actualType = currentQuiz ? (currentQuiz.type || 'single') : 'single';
+    
+    const isExamMode = stats.settings?.theme === 'exam';
 
     useEffect(() => {
         setSelectedTask('all');
@@ -1389,7 +1442,6 @@ AWSサービスの基本的な定義や目的をストレートに問う問題�
                 ? `- 問題は「択一選択（4択、正解1つ）」と「複数選択（5択、正解2つ）」を混ぜて作成し、全${count}問のうち、**必ず正確に${multipleChoiceCount}問を複数選択問題(type: "multiple")にしてください**。残りは択一選択問題(type: "single")としてください。`
                 : `- 問題は「択一選択（4択、正解1つ）」と「複数選択（5択、正解2つ）」を混ぜて作成してください（割合は問いません）。`;
 
-
             const systemPrompt = `あなたはAWS認定クラウドプラクティショナー(CLF-C02)の試験問題作成プロフェッショナルです。
 以下のルールに従い、本番試験のレベルや傾向に沿った、自然で高品質な模擬テストを${count}問作成してください。
 
@@ -1404,7 +1456,7 @@ ${formatInstruction}
 【出題形式のバリエーション】
 問題がワンパターンにならないよう、以下の2つの形式をバランスよく混ぜて作成してください。
 1. 機能からサービスを問う形式: 提示された課題や要件を満たす、最適なAWSサービス名を選択肢から選ばせる問題。
-2. サービスから機能を問う形式: 特定のAWSサービス名を問題文で提示し、その正しい機能、役割、または導入するメリットなどを文章の選択肢から選ばせる問題。
+2. サービスから機能を問う形式: 特定のAWSサービス名を問題文で提示し、その正しい機能、役割、または導入する最大のメリットを文章の選択肢から選ばせる問題。
 
 ${difficultyInstruction}
 
@@ -1484,28 +1536,28 @@ ${keywordInstruction}
     return (
         <div className="max-w-4xl mx-auto h-full flex flex-col animate-in fade-in duration-300">
             <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4">
-                <h2 className={`font-bold flex items-center shrink-0 ${textClasses.title}`}>
-                    <ClipboardList className="mr-2 text-blue-600 dark:text-blue-400" /> 模擬テスト
+                <h2 className={`font-bold flex items-center shrink-0 ${textClasses.title} ${isExamMode ? 'text-black' : ''}`}>
+                    <ClipboardList className={`mr-2 ${isExamMode ? 'text-black' : 'text-blue-600 dark:text-blue-400'}`} /> 模擬テスト
                 </h2>
                 
-                <div className={`flex flex-wrap items-center bg-white dark:bg-gray-800 p-2 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 transition-colors gap-y-2 gap-x-2 ${textClasses.sm}`}>
+                <div className={`flex flex-wrap items-center ${isExamMode ? 'bg-white border-2 border-gray-400 rounded-none' : 'bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700'} p-2 transition-colors gap-y-2 gap-x-2 ${textClasses.sm}`}>
                     <div className="flex items-center px-2">
-                        <span className="font-medium text-gray-600 dark:text-gray-300 mr-2 shrink-0">難易度:</span>
+                        <span className={`font-medium mr-2 shrink-0 ${isExamMode ? 'text-black' : 'text-gray-600 dark:text-gray-300'}`}>難易度:</span>
                         <select 
                             value={difficulty} onChange={(e) => setDifficulty(e.target.value)} disabled={generating}
-                            className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-md px-2 py-1 outline-none focus:border-blue-500 transition-colors"
+                            className={`${isExamMode ? 'bg-white border-gray-400 text-black rounded-none' : 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-md'} border px-2 py-1 outline-none focus:border-blue-500 transition-colors`}
                         >
                             <option value="初級">初級</option>
                             <option value="中級">中級</option>
                             <option value="上級">上級</option>
                         </select>
                     </div>
-                    <div className="hidden sm:block w-px h-6 bg-gray-200 dark:bg-gray-600 transition-colors"></div>
+                    <div className={`hidden sm:block w-px h-6 transition-colors ${isExamMode ? 'bg-gray-400' : 'bg-gray-200 dark:bg-gray-600'}`}></div>
                     <div className="flex items-center px-2">
-                        <span className="font-medium text-gray-600 dark:text-gray-300 mr-2 shrink-0">分野:</span>
+                        <span className={`font-medium mr-2 shrink-0 ${isExamMode ? 'text-black' : 'text-gray-600 dark:text-gray-300'}`}>分野:</span>
                         <select 
                             value={selectedDomain} onChange={(e) => setSelectedDomain(e.target.value)} disabled={generating}
-                            className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-md px-2 py-1 outline-none focus:border-blue-500 transition-colors max-w-[140px] sm:max-w-xs truncate"
+                            className={`${isExamMode ? 'bg-white border-gray-400 text-black rounded-none' : 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-md'} border px-2 py-1 outline-none focus:border-blue-500 transition-colors max-w-[140px] sm:max-w-xs truncate`}
                         >
                             <option value="all">全分野からランダム</option>
                             <option value="第1分野: クラウドのコンセプト">第1分野 (コンセプト)</option>
@@ -1514,12 +1566,12 @@ ${keywordInstruction}
                             <option value="第4分野: 請求、料金、サポート">第4分野 (請求・サポート)</option>
                         </select>
                     </div>
-                    <div className="hidden sm:block w-px h-6 bg-gray-200 dark:bg-gray-600 transition-colors"></div>
+                    <div className={`hidden sm:block w-px h-6 transition-colors ${isExamMode ? 'bg-gray-400' : 'bg-gray-200 dark:bg-gray-600'}`}></div>
                     <div className="flex items-center px-2">
-                        <span className="font-medium text-gray-600 dark:text-gray-300 mr-2 shrink-0">タスク:</span>
+                        <span className={`font-medium mr-2 shrink-0 ${isExamMode ? 'text-black' : 'text-gray-600 dark:text-gray-300'}`}>タスク:</span>
                         <select 
                             value={selectedTask} onChange={(e) => setSelectedTask(e.target.value)} disabled={generating || selectedDomain === 'all'}
-                            className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-md px-2 py-1 outline-none focus:border-blue-500 transition-colors max-w-[140px] sm:max-w-xs truncate disabled:opacity-50"
+                            className={`${isExamMode ? 'bg-white border-gray-400 text-black rounded-none' : 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-md'} border px-2 py-1 outline-none focus:border-blue-500 transition-colors max-w-[140px] sm:max-w-xs truncate disabled:opacity-50`}
                         >
                             <option value="all">{selectedDomain === 'all' ? '分野を選択してください' : 'すべてのタスク'}</option>
                             {selectedDomain !== 'all' && TASKS_BY_DOMAIN[selectedDomain].map(task => (
@@ -1527,14 +1579,14 @@ ${keywordInstruction}
                             ))}
                         </select>
                     </div>
-                    <div className="hidden lg:block w-px h-6 bg-gray-200 dark:bg-gray-600 transition-colors"></div>
+                    <div className={`hidden lg:block w-px h-6 transition-colors ${isExamMode ? 'bg-gray-400' : 'bg-gray-200 dark:bg-gray-600'}`}></div>
                     <div className="flex items-center px-2 w-full lg:w-auto mt-2 lg:mt-0">
-                        <span className="font-medium text-gray-600 dark:text-gray-300 mr-2 shrink-0">作成:</span>
+                        <span className={`font-medium mr-2 shrink-0 ${isExamMode ? 'text-black' : 'text-gray-600 dark:text-gray-300'}`}>作成:</span>
                         <div className="flex space-x-2">
                             {[1, 5, 10].map(num => (
                                 <button
                                     key={num} onClick={() => generateQuizzes(num)} disabled={generating}
-                                    className="px-3 py-1 bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/60 rounded-md font-medium transition disabled:opacity-50 shrink-0"
+                                    className={`px-3 py-1 font-medium transition disabled:opacity-50 shrink-0 ${isExamMode ? 'bg-gray-200 text-black border border-gray-400 hover:bg-gray-300 rounded-none' : 'bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/60 rounded-md'}`}
                                 >
                                     {num}問
                                 </button>
@@ -1546,34 +1598,34 @@ ${keywordInstruction}
 
             <div className="flex-1 overflow-y-auto pb-8 -mx-4 px-4 md:mx-0 md:px-0">
                 {generating ? (
-                    <div className="bg-white dark:bg-gray-800 p-8 md:p-12 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center h-64 transition-colors">
-                        <Loader2 className="w-10 h-10 text-blue-500 dark:text-blue-400 animate-spin mb-4" />
-                        <p className={`text-gray-600 dark:text-gray-300 font-medium ${textClasses.base}`}>AIが新しい問題を作成しています...</p>
+                    <div className={`${isExamMode ? 'bg-white border-2 border-gray-400 rounded-none' : 'bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700'} p-8 md:p-12 flex flex-col items-center justify-center h-64 transition-colors`}>
+                        <Loader2 className={`w-10 h-10 animate-spin mb-4 ${isExamMode ? 'text-black' : 'text-blue-500 dark:text-blue-400'}`} />
+                        <p className={`font-medium ${isExamMode ? 'text-black' : 'text-gray-600 dark:text-gray-300'} ${textClasses.base}`}>AIが新しい問題を作成しています...</p>
                     </div>
                 ) : !currentQuiz ? (
-                    <div className="bg-white dark:bg-gray-800 p-8 md:p-12 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center text-center transition-colors">
-                        <ClipboardList className="w-12 h-12 text-blue-400 dark:text-blue-500 mb-4" />
-                        <h3 className={`font-bold mb-2 ${textClasses.xl}`}>問題を作成しましょう</h3>
-                        <p className={`text-gray-500 dark:text-gray-400 mb-6 ${textClasses.base}`}>上のメニューから難易度や分野を選び、「作成」ボタンを押して新しい問題を作成してください。</p>
-                        <button onClick={() => generateQuizzes(5)} className={`px-6 py-3 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 font-medium flex items-center transition ${textClasses.base}`}>
+                    <div className={`${isExamMode ? 'bg-white border-2 border-gray-400 rounded-none' : 'bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700'} p-8 md:p-12 flex flex-col items-center justify-center text-center transition-colors`}>
+                        <ClipboardList className={`w-12 h-12 mb-4 ${isExamMode ? 'text-black' : 'text-blue-400 dark:text-blue-500'}`} />
+                        <h3 className={`font-bold mb-2 ${isExamMode ? 'text-black' : ''} ${textClasses.xl}`}>問題を作成しましょう</h3>
+                        <p className={`mb-6 ${isExamMode ? 'text-black' : 'text-gray-500 dark:text-gray-400'} ${textClasses.base}`}>上のメニューから難易度や分野を選び、「作成」ボタンを押して新しい問題を作成してください。</p>
+                        <button onClick={() => generateQuizzes(5)} className={`px-6 py-3 font-medium flex items-center transition ${isExamMode ? 'bg-gray-200 text-black border-2 border-gray-400 hover:bg-gray-300 rounded-none' : 'bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600'} ${textClasses.base}`}>
                             <Plus className="w-5 h-5 mr-2" /> 5問作成する
                         </button>
                     </div>
                 ) : (
-                    <div className="bg-white dark:bg-gray-800 p-4 md:p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
+                    <div className={`${isExamMode ? 'bg-white border-2 border-gray-400 rounded-none text-black' : 'bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700'} p-4 md:p-8 transition-colors`}>
                         <div className="mb-6 flex flex-col md:flex-row justify-between items-start">
                             <div className="flex-1 w-full pr-0 md:pr-4">
-                                <span className={`inline-block px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full font-semibold mb-4 border border-gray-200 dark:border-gray-600 transition-colors ${textClasses.sm}`}>
+                                <span className={`inline-block px-3 py-1 font-semibold mb-4 border transition-colors ${isExamMode ? 'bg-gray-100 text-black border-gray-400 rounded-none' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full border-gray-200 dark:border-gray-600'} ${textClasses.sm}`}>
                                     {currentQuiz.domain} {currentQuiz.task_id && `- タスク ${currentQuiz.task_id}`}
                                 </span>
                                 {actualType === 'multiple' && (
-                                    <span className={`inline-block ml-0 mt-2 md:mt-0 md:ml-2 px-3 py-1 bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 rounded-full font-bold mb-4 border border-amber-200 dark:border-amber-800 transition-colors ${textClasses.sm}`}>
+                                    <span className={`inline-block ml-0 mt-2 md:mt-0 md:ml-2 px-3 py-1 font-bold mb-4 border transition-colors ${isExamMode ? 'bg-white text-black border-black rounded-none' : 'bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 rounded-full border-amber-200 dark:border-amber-800'} ${textClasses.sm}`}>
                                         ※2つ選択してください
                                     </span>
                                 )}
                                 <h3 className={`font-bold leading-relaxed ${textClasses.xl}`}>{currentQuiz.question}</h3>
                             </div>
-                            <span className={`text-gray-400 dark:text-gray-500 font-bold shrink-0 mt-4 md:mt-0 ${textClasses.sm}`}>Q. {currentIndex + 1}</span>
+                            <span className={`font-bold shrink-0 mt-4 md:mt-0 ${isExamMode ? 'text-black' : 'text-gray-400 dark:text-gray-500'} ${textClasses.sm}`}>Q. {currentIndex + 1}</span>
                         </div>
 
                         <div className="space-y-3">
@@ -1581,30 +1633,43 @@ ${keywordInstruction}
                                 const isSelected = selectedOptions.includes(idx);
                                 const isCorrect = actualAnswerIndices.includes(idx);
                                 
-                                let btnClass = "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300 dark:hover:border-blue-500";
+                                let btnClass = isExamMode
+                                    ? "bg-white border-gray-400 hover:bg-gray-100 rounded-none text-black"
+                                    : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300 dark:hover:border-blue-500 rounded-xl";
                                 
                                 if (isAnswered) {
-                                    if (isCorrect) btnClass = "bg-green-50 dark:bg-green-900/30 border-green-500 text-green-900 dark:text-green-100 font-medium";
-                                    else if (isSelected && !isCorrect) btnClass = "bg-red-50 dark:bg-red-900/30 border-red-400 text-red-900 dark:text-red-100";
-                                    else btnClass = "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 opacity-50";
+                                    if (isExamMode) {
+                                        if (isCorrect) btnClass = "bg-gray-200 border-black font-bold rounded-none text-black";
+                                        else if (isSelected && !isCorrect) btnClass = "bg-gray-100 border-gray-500 rounded-none text-black";
+                                        else btnClass = "bg-white border-gray-300 opacity-50 rounded-none text-black";
+                                    } else {
+                                        if (isCorrect) btnClass = "bg-green-50 dark:bg-green-900/30 border-green-500 text-green-900 dark:text-green-100 font-medium rounded-xl";
+                                        else if (isSelected && !isCorrect) btnClass = "bg-red-50 dark:bg-red-900/30 border-red-400 text-red-900 dark:text-red-100 rounded-xl";
+                                        else btnClass = "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 opacity-50 rounded-xl";
+                                    }
                                 } else if (isSelected) {
-                                    // 複数選択用の「選択中」ハイライト
-                                    btnClass = "bg-blue-50 dark:bg-blue-900/30 border-blue-400 dark:border-blue-500 text-blue-900 dark:text-blue-100 ring-2 ring-blue-500/20";
+                                    if (isExamMode) {
+                                        btnClass = "bg-gray-200 border-black text-black ring-1 ring-black rounded-none";
+                                    } else {
+                                        btnClass = "bg-blue-50 dark:bg-blue-900/30 border-blue-400 dark:border-blue-500 text-blue-900 dark:text-blue-100 ring-2 ring-blue-500/20 rounded-xl";
+                                    }
                                 }
 
                                 return (
                                     <button
                                         key={idx} onClick={() => handleOptionClick(idx)} disabled={isAnswered}
-                                        className={`w-full text-left p-3 md:p-4 rounded-xl border-2 transition-all flex items-start ${btnClass} ${textClasses.base}`}
+                                        className={`w-full text-left p-3 md:p-4 border-2 transition-all flex items-start ${btnClass} ${textClasses.base}`}
                                     >
-                                        <span className="shrink-0 inline-block w-8 font-bold text-gray-400 dark:text-gray-500">
+                                        <span className={`shrink-0 inline-block w-8 font-bold ${isExamMode ? 'text-black' : 'text-gray-400 dark:text-gray-500'}`}>
                                             {actualType === 'multiple' 
-                                                ? (isSelected ? <CheckSquare className="w-5 h-5 text-blue-500 mr-2 inline" /> : <Square className="w-5 h-5 text-gray-400 mr-2 inline" />)
+                                                ? (isSelected 
+                                                    ? (isExamMode ? <CheckSquare className="w-5 h-5 text-black mr-2 inline" /> : <CheckSquare className="w-5 h-5 text-blue-500 mr-2 inline" />) 
+                                                    : <Square className="w-5 h-5 text-gray-400 mr-2 inline" />)
                                                 : String.fromCharCode(65 + idx) + "."}
                                         </span>
                                         <span className="flex-1 ml-1">{opt}</span>
-                                        {isAnswered && isCorrect && <CheckCircle className="w-6 h-6 text-green-500 shrink-0 ml-2" />}
-                                        {isAnswered && isSelected && !isCorrect && <XCircle className="w-6 h-6 text-red-400 dark:text-red-500 shrink-0 ml-2" />}
+                                        {isAnswered && isCorrect && !isExamMode && <CheckCircle className="w-6 h-6 text-green-500 shrink-0 ml-2" />}
+                                        {isAnswered && isSelected && !isCorrect && !isExamMode && <XCircle className="w-6 h-6 text-red-400 dark:text-red-500 shrink-0 ml-2" />}
                                     </button>
                                 );
                             })}
@@ -1615,7 +1680,7 @@ ${keywordInstruction}
                                 <button 
                                     onClick={handleConfirmMultiple}
                                     disabled={selectedOptions.length !== 2}
-                                    className={`px-6 py-3 rounded-xl font-bold flex items-center shadow-sm transition ${selectedOptions.length === 2 ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'} ${textClasses.base}`}
+                                    className={`px-6 py-3 font-bold flex items-center shadow-sm transition ${isExamMode ? 'bg-gray-200 text-black border-2 border-gray-400 hover:bg-gray-300 rounded-none' : 'rounded-xl'} ${selectedOptions.length === 2 && !isExamMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : (!isExamMode ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed' : '')} ${textClasses.base}`}
                                 >
                                     解答を確定する
                                 </button>
@@ -1624,14 +1689,14 @@ ${keywordInstruction}
 
                         {!isAnswered && currentIndex > 0 && actualType !== 'multiple' && (
                             <div className="mt-6 flex justify-start">
-                                <button onClick={handlePrev} className={`px-5 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 font-bold flex items-center shadow-sm transition ${textClasses.base}`}>
+                                <button onClick={handlePrev} className={`px-5 py-2.5 font-bold flex items-center shadow-sm transition ${isExamMode ? 'bg-gray-200 text-black border border-gray-400 hover:bg-gray-300 rounded-none' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600'} ${textClasses.base}`}>
                                     <ChevronLeft className="mr-1 w-5 h-5" /> 前の問題に戻る
                                 </button>
                             </div>
                         )}
                         {!isAnswered && currentIndex > 0 && actualType === 'multiple' && (
                             <div className="mt-6 flex justify-start">
-                                <button onClick={handlePrev} className={`px-5 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 font-bold flex items-center shadow-sm transition ${textClasses.base}`}>
+                                <button onClick={handlePrev} className={`px-5 py-2.5 font-bold flex items-center shadow-sm transition ${isExamMode ? 'bg-gray-200 text-black border border-gray-400 hover:bg-gray-300 rounded-none' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600'} ${textClasses.base}`}>
                                     <ChevronLeft className="mr-1 w-5 h-5" /> 戻る
                                 </button>
                             </div>
@@ -1639,10 +1704,12 @@ ${keywordInstruction}
 
                         {isAnswered && (
                             <div className="mt-8 animate-in fade-in slide-in-from-top-4 duration-300">
-                                <div className={`p-4 md:p-5 rounded-xl border transition-colors ${
-                                    (actualType === 'multiple' ? (selectedOptions.length === actualAnswerIndices.length && selectedOptions.every(val => actualAnswerIndices.includes(val))) : selectedOptions[0] === actualAnswerIndices[0])
-                                    ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' 
-                                    : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                                <div className={`p-4 md:p-5 border transition-colors ${
+                                    isExamMode
+                                        ? 'bg-white border-gray-400 rounded-none'
+                                        : ((actualType === 'multiple' ? (selectedOptions.length === actualAnswerIndices.length && selectedOptions.every(val => actualAnswerIndices.includes(val))) : selectedOptions[0] === actualAnswerIndices[0])
+                                            ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 rounded-xl' 
+                                            : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 rounded-xl')
                                 }`}>
                                     <div className="flex items-center mb-3">
                                         {(() => {
@@ -1650,6 +1717,14 @@ ${keywordInstruction}
                                                 ? (selectedOptions.length === actualAnswerIndices.length && selectedOptions.every(val => actualAnswerIndices.includes(val)))
                                                 : (selectedOptions[0] === actualAnswerIndices[0]);
                                             
+                                            if (isExamMode) {
+                                                return allCorrect ? (
+                                                    <><span className={`font-bold text-black ${textClasses.lg}`}>正解</span></>
+                                                ) : (
+                                                    <><span className={`font-bold text-black ${textClasses.lg}`}>不正解</span></>
+                                                );
+                                            }
+
                                             return allCorrect ? (
                                                 <><CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400 mr-2" /> <span className={`font-bold text-green-800 dark:text-green-300 ${textClasses.lg}`}>正解！</span></>
                                             ) : (
@@ -1657,13 +1732,13 @@ ${keywordInstruction}
                                             )
                                         })()}
                                     </div>
-                                    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-100/50 dark:border-gray-700 shadow-sm transition-colors whitespace-pre-wrap">
-                                        <p className={`text-gray-500 dark:text-gray-400 font-bold mb-2 ${textClasses.sm}`}>解説:</p>
-                                        <p className={`text-gray-800 dark:text-gray-200 leading-relaxed ${textClasses.base}`}>
+                                    <div className={`${isExamMode ? 'bg-white border-gray-300 rounded-none' : 'bg-white dark:bg-gray-800 rounded-lg border-gray-100/50 dark:border-gray-700 shadow-sm'} p-4 border transition-colors whitespace-pre-wrap`}>
+                                        <p className={`font-bold mb-2 ${isExamMode ? 'text-black' : 'text-gray-500 dark:text-gray-400'} ${textClasses.sm}`}>解説:</p>
+                                        <p className={`leading-relaxed ${isExamMode ? 'text-black' : 'text-gray-800 dark:text-gray-200'} ${textClasses.base}`}>
                                             {currentQuiz.explanation.split(/(\*\*.*?\*\*)/g).map((part, i) => {
                                                 if (part.startsWith('**') && part.endsWith('**')) {
                                                     return (
-                                                        <strong key={i} className="inline-flex items-center px-2 py-0.5 mx-0.5 my-0.5 rounded-md border font-bold text-[0.95em] shadow-sm align-baseline transition-colors bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/40 dark:border-blue-700 dark:text-blue-300">
+                                                        <strong key={i} className={`inline-flex items-center px-2 py-0.5 mx-0.5 my-0.5 border font-bold text-[0.95em] align-baseline transition-colors ${isExamMode ? 'bg-gray-100 border-gray-400 text-black rounded-none' : 'rounded-md shadow-sm bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/40 dark:border-blue-700 dark:text-blue-300'}`}>
                                                             {part.slice(2, -2)}
                                                         </strong>
                                                     );
@@ -1685,17 +1760,17 @@ ${keywordInstruction}
                                             const message = `先ほど模擬テストで解いた以下の問題について質問があります。もう少し詳しく教えてください。\n\n【問題】\n${currentQuiz.question}\n\n【正解】\n${correctAnswerText}\n\n【自分の回答】\n${userAnswerText} (${allCorrect ? '正解' : '不正解'})\n\n【解説】\n${currentQuiz.explanation}`;
                                             onAskTutor(message);
                                         }}
-                                        className={`px-4 py-2.5 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/50 border border-purple-200 dark:border-purple-800/50 rounded-xl font-bold flex items-center shadow-sm transition-colors ${textClasses.sm}`}
+                                        className={`px-4 py-2.5 font-bold flex items-center shadow-sm transition-colors ${isExamMode ? 'bg-gray-100 text-black border border-gray-400 hover:bg-gray-200 rounded-none' : 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/50 border border-purple-200 dark:border-purple-800/50 rounded-xl'} ${textClasses.sm}`}
                                     >
-                                        <Bot className="w-5 h-5 mr-2" /> この問題をAIに質問する
+                                        <Bot className={`w-5 h-5 mr-2 ${isExamMode ? 'text-black' : ''}`} /> この問題をAIに質問する
                                     </button>
                                 </div>
 
                                 <div className="mt-6 flex flex-col-reverse sm:flex-row justify-between items-center gap-3">
-                                    <button onClick={handlePrev} disabled={currentIndex === 0} className={`w-full sm:w-auto px-5 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 font-bold flex items-center justify-center shadow-sm transition disabled:opacity-0 disabled:pointer-events-none ${textClasses.base}`}>
+                                    <button onClick={handlePrev} disabled={currentIndex === 0} className={`w-full sm:w-auto px-5 py-2.5 font-bold flex items-center justify-center transition disabled:opacity-0 disabled:pointer-events-none ${isExamMode ? 'bg-gray-200 text-black border border-gray-400 hover:bg-gray-300 rounded-none' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 shadow-sm'} ${textClasses.base}`}>
                                         <ChevronLeft className="mr-1 w-5 h-5" /> 前の問題に戻る
                                     </button>
-                                    <button onClick={handleNext} className={`w-full sm:w-auto px-6 py-3 bg-blue-600 dark:bg-blue-500 text-white rounded-xl hover:bg-blue-700 dark:hover:bg-blue-600 font-bold flex items-center justify-center shadow-sm transition ${textClasses.base}`}>
+                                    <button onClick={handleNext} className={`w-full sm:w-auto px-6 py-3 font-bold flex items-center justify-center transition ${isExamMode ? 'bg-gray-300 text-black border border-gray-500 hover:bg-gray-400 rounded-none' : 'bg-blue-600 dark:bg-blue-500 text-white rounded-xl hover:bg-blue-700 dark:hover:bg-blue-600 shadow-sm'} ${textClasses.base}`}>
                                         次の問題へ <ChevronRight className="ml-1 w-5 h-5" />
                                     </button>
                                 </div>
