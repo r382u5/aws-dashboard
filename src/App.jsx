@@ -939,22 +939,20 @@ function DashboardView({ stats, updateStats, setUsedQuizIds, textClasses, userAp
                 </div>
             )}
 
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-6 rounded-2xl shadow-sm border border-blue-100 dark:border-blue-800/50 mb-8 transition-colors">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mb-8 transition-colors">
+                <h3 className={`font-bold text-gray-800 dark:text-gray-100 flex items-center mb-4 ${textClasses.xl}`}>
+                    <Map className="mr-2 w-6 h-6 text-blue-600 dark:text-blue-400" /> 学習ロードマップ進捗
+                </h3>
                 <div className="flex justify-between items-end mb-2">
-                    <div>
-                        <h3 className={`font-bold text-blue-800 dark:text-blue-300 flex items-center ${textClasses.xl}`}>
-                            <Map className="mr-2 w-5 h-5" /> 学習ロードマップ進捗
-                        </h3>
-                        <p className={`text-blue-600/80 dark:text-blue-400/80 font-medium mt-1 ${textClasses.sm}`}>
-                            全体の進み具合 ({completedRoadmapTasks} / {totalRoadmapTasks} 完了)
-                        </p>
-                    </div>
-                    <p className={`font-bold text-blue-700 dark:text-blue-400 ${textClasses.big}`}>
+                    <p className={`text-gray-500 dark:text-gray-400 font-medium ${textClasses.sm}`}>
+                        全体の進み具合 ({completedRoadmapTasks} / {totalRoadmapTasks} 完了)
+                    </p>
+                    <p className={`font-bold text-blue-600 dark:text-blue-400 ${textClasses.lg}`}>
                         {Math.round(roadmapPercent)}%
                     </p>
                 </div>
-                <div className="w-full bg-blue-200/50 dark:bg-blue-900/50 rounded-full h-3 mt-3">
-                    <div className="bg-blue-600 dark:bg-blue-500 h-3 rounded-full transition-all duration-1000" style={{ width: `${roadmapPercent}%` }}></div>
+                <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-3">
+                    <div className="bg-blue-500 h-3 rounded-full transition-all duration-1000" style={{ width: `${roadmapPercent}%` }}></div>
                 </div>
             </div>
 
