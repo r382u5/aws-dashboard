@@ -784,6 +784,9 @@ function DashboardView({ stats, updateStats, setUsedQuizIds, textClasses, userAp
     
     const progressPercent = stats.totalAnswered > 0 ? (stats.correctAnswers / stats.totalAnswered) * 100 : 0;
     
+    const recent30 = (stats.recentResults || []).slice(-30);
+    const recent30Percent = recent30.length > 0 ? (recent30.filter(r => r).length / recent30.length) * 100 : 0;
+    
     const totalRoadmapTasks = 15;
     const completedRoadmapTasks = stats.roadmapProgress?.length || 0;
     const roadmapPercent = (completedRoadmapTasks / totalRoadmapTasks) * 100;
@@ -865,7 +868,12 @@ function DashboardView({ stats, updateStats, setUsedQuizIds, textClasses, userAp
                 <BarChart3 className="mr-2 text-blue-600 dark:text-blue-400" /> 学習の進捗状況
             </h2>
 
+            {}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
+                <div className="bg-amber-50 dark:bg-amber-900/20 p-4 md:p-6 rounded-2xl shadow-sm border border-amber-200 dark:border-amber-800/50 flex flex-col items-center justify-center transition-colors text-center">
+                    <p className={`text-amber-700 dark:text-amber-400 font-bold mb-1 ${textClasses.sm}`}>直近30問の正答率</p>
+                    <p className={`font-bold text-amber-600 dark:text-amber-400 ${textClasses.super}`}>{recent30.length > 0 ? recent30Percent.toFixed(1) : '-'}<span className={`font-normal ml-1 ${textClasses.sm}`}>%</span></p>
+                </div>
                 <div className="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center transition-colors text-center">
                     <p className={`text-gray-500 dark:text-gray-400 font-medium mb-1 ${textClasses.sm}`}>総合正答率</p>
                     <p className={`font-bold text-blue-600 dark:text-blue-400 ${textClasses.super}`}>{progressPercent.toFixed(1)}<span className={`font-normal ml-1 ${textClasses.sm}`}>%</span></p>
@@ -886,12 +894,13 @@ function DashboardView({ stats, updateStats, setUsedQuizIds, textClasses, userAp
                     </p>
                 </div>
                 <div className="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center transition-colors text-center">
-                    <p className={`text-gray-500 dark:text-gray-400 font-medium mb-1 ${textClasses.sm}`}>回答済み問題</p>
-                    <p className={`font-bold text-gray-800 dark:text-gray-100 ${textClasses.super}`}>{stats.totalAnswered}<span className={`font-normal ml-1 ${textClasses.sm}`}>問</span></p>
-                </div>
-                <div className="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center transition-colors text-center">
-                    <p className={`text-gray-500 dark:text-gray-400 font-medium mb-1 ${textClasses.sm}`}>正解数</p>
-                    <p className={`font-bold text-green-600 dark:text-green-400 ${textClasses.super}`}>{stats.correctAnswers}<span className={`font-normal ml-1 ${textClasses.sm}`}>問</span></p>
+                    <p className={`text-gray-500 dark:text-gray-400 font-medium mb-1 ${textClasses.sm}`}>正解 / 回答数</p>
+                    <p className={`font-bold flex items-baseline justify-center`}>
+                        <span className={`text-green-600 dark:text-green-400 ${textClasses.title}`}>{stats.correctAnswers}</span>
+                        <span className={`font-normal mx-1 text-gray-400 ${textClasses.sm}`}>/</span>
+                        <span className={`text-gray-800 dark:text-gray-200 ${textClasses.title}`}>{stats.totalAnswered}</span>
+                        <span className={`font-normal ml-1 text-gray-500 ${textClasses.sm}`}>問</span>
+                    </p>
                 </div>
             </div>
 
