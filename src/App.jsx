@@ -1322,30 +1322,45 @@ function QuizView({ quizPool, setQuizPool, usedQuizIds, setUsedQuizIds, stats, u
             isCorrect = selectedArray[0] === actualAnswerIndices[0];
         }
 
-        const newStats = { ...stats };
-        newStats.totalAnswered += 1;
-        if (isCorrect) newStats.correctAnswers += 1;
-        
-        const newRecent = [...(newStats.recentResults || []), isCorrect];
-        if (newRecent.length > 70) newRecent.shift();
-        newStats.recentResults = newRecent;
-        
-        let domainKey = currentQuiz.domain;
-        if(!DOMAINS.includes(domainKey)) {
-             domainKey = DOMAINS.find(d => currentQuiz.domain.includes(d.split(':')[0])) || DOMAINS[0];
-        }
-        if (newStats.domainStats[domainKey]) {
-            newStats.domainStats[domainKey].total += 1;
-            if (isCorrect) newStats.domainStats[domainKey].correct += 1;
-        }
+        updateStats(prevStats => {
+            // 他の記録（学習時間など）を消さないようにディープコピーして確実に合流させる
+            const newStats = { 
+                ...prevStats,
+                domainStats: { ...prevStats.domainStats },
+                dailyStats: { ...prevStats.dailyStats }
+            };
+            
+            newStats.totalAnswered = (newStats.totalAnswered || 0) + 1;
+            if (isCorrect) newStats.correctAnswers = (newStats.correctAnswers || 0) + 1;
+            
+            const newRecent = [...(newStats.recentResults || []), isCorrect];
+            if (newRecent.length > 70) newRecent.shift();
+            newStats.recentResults = newRecent;
+            
+            let domainKey = currentQuiz.domain;
+            if(!DOMAINS.includes(domainKey)) {
+                 domainKey = DOMAINS.find(d => currentQuiz.domain.includes(d.split(':')[0])) || DOMAINS[0];
+            }
+            
+            if (newStats.domainStats[domainKey]) {
+                newStats.domainStats[domainKey] = { ...newStats.domainStats[domainKey] };
+                newStats.domainStats[domainKey].total += 1;
+                if (isCorrect) newStats.domainStats[domainKey].correct += 1;
+            }
 
-        const today = formatDateStr(new Date());
-        if (!newStats.dailyStats) newStats.dailyStats = {};
-        if (!newStats.dailyStats[today]) newStats.dailyStats[today] = { answered: 0, correct: 0, studyTime: 0 };
-        newStats.dailyStats[today].answered += 1;
-        if (isCorrect) newStats.dailyStats[today].correct += 1;
+            const today = formatDateStr(new Date());
+            if (!newStats.dailyStats[today]) {
+                newStats.dailyStats[today] = { answered: 0, correct: 0, studyTime: 0 };
+            } else {
+                newStats.dailyStats[today] = { ...newStats.dailyStats[today] };
+            }
+            
+            newStats.dailyStats[today].answered += 1;
+            if (isCorrect) newStats.dailyStats[today].correct += 1;
 
-        updateStats(newStats);
+            return newStats;
+        });
+        
         setUsedQuizIds(prev => [...prev, currentQuiz.id]);
     };
 
