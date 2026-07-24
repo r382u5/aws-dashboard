@@ -13,9 +13,8 @@ import { getFirestore, doc, setDoc, onSnapshot } from 'firebase/firestore';
 
 // --- Configuration ---
 const SHOW_ESTIMATED_SCORE = false; 
-const SHOW_API_KEY_SETTING = true; // APIキー設定UIの表示/非表示を切り替えるスイッチ
 
-const fallbackApiKey = ""; // ★ここにご自身のAPIキーを貼り付けてください★
+const fallbackApiKey = ""; 
 const isCanvasEnv = typeof __app_id !== 'undefined';
 const getModelText = (key) => key ? "gemini-3.5-flash-lite" : "gemini-2.5-flash-preview-09-2025";
 
@@ -845,7 +844,7 @@ function DashboardView({ stats, updateStats, setUsedQuizIds, textClasses, userAp
 
     return (
         <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {SHOW_API_KEY_SETTING && !userApiKey && (
+            {!userApiKey && (
                 <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-colors">
                     <div className="flex items-start">
                         <Info className="w-6 h-6 text-blue-600 dark:text-blue-400 mr-3 shrink-0 mt-0.5" />
@@ -1035,29 +1034,27 @@ function DashboardView({ stats, updateStats, setUsedQuizIds, textClasses, userAp
                         </button>
                     </div>
                     
-                    {SHOW_API_KEY_SETTING && (
-                        <div className="pt-4 border-t border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row sm:items-start gap-4">
-                            <span className={`font-medium text-gray-700 dark:text-gray-300 shrink-0 sm:mt-2 ${textClasses.base}`}>Gemini APIキー:</span>
-                            <div className="flex-1 w-full max-w-lg">
-                                <input 
-                                    type="password" 
-                                    value={userApiKey}
-                                    onChange={(e) => handleApiKeyUpdate(e.target.value)}
-                                    placeholder="AI機能を使う場合に入力してください"
-                                    className={`p-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 w-full transition-colors shadow-inner ${textClasses.base}`}
-                                />
-                                <div className="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">
-                                    ※取得したAPIキーはお使いのブラウザ（ローカル環境）にのみ保存され、安全にAPIリクエストにのみ使用されます。模擬テストの自動生成とAIチューター機能を利用するには設定が必要です。
-                                    <button 
-                                        onClick={() => setShowApiGuide(true)} 
-                                        className="text-blue-600 dark:text-blue-400 hover:underline font-bold ml-1 inline-flex items-center"
-                                    >
-                                        <Info className="w-3 h-3 mr-1" />APIキーの取得方法はこちら
-                                    </button>
-                                </div>
+                    <div className="pt-4 border-t border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row sm:items-start gap-4">
+                        <span className={`font-medium text-gray-700 dark:text-gray-300 shrink-0 sm:mt-2 ${textClasses.base}`}>Gemini APIキー:</span>
+                        <div className="flex-1 w-full max-w-lg">
+                            <input 
+                                type="password" 
+                                value={userApiKey}
+                                onChange={(e) => handleApiKeyUpdate(e.target.value)}
+                                placeholder="AI機能を使う場合に入力してください"
+                                className={`p-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 w-full transition-colors shadow-inner ${textClasses.base}`}
+                            />
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">
+                                ※取得したAPIキーはお使いのブラウザ（ローカル環境）にのみ保存され、安全にAPIリクエストにのみ使用されます。模擬テストの自動生成とAIチューター機能を利用するには設定が必要です。
+                                <button 
+                                    onClick={() => setShowApiGuide(true)} 
+                                    className="text-blue-600 dark:text-blue-400 hover:underline font-bold ml-1 inline-flex items-center"
+                                >
+                                    <Info className="w-3 h-3 mr-1" />APIキーの取得方法はこちら
+                                </button>
                             </div>
                         </div>
-                    )}
+                    </div>
                 </div>
             </div>
 
