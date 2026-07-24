@@ -13,15 +13,9 @@ import { getFirestore, doc, setDoc, onSnapshot } from 'firebase/firestore';
 
 // --- Configuration ---
 const SHOW_ESTIMATED_SCORE = false; 
-const SHOW_API_KEY_SETTING = false; // Vercelの環境変数を使うため、画面の入力欄は非表示にする
+const SHOW_API_KEY_SETTING = true; // APIキー設定UIの表示/非表示を切り替えるスイッチ
 
-let fallbackApiKey = "";
-try {
-    if (typeof process !== 'undefined' && process.env) {
-        fallbackApiKey = process.env.VITE_GEMINI_API_KEY || process.env.REACT_APP_GEMINI_API_KEY || "";
-    }
-} catch (e) {}
-
+const fallbackApiKey = ""; // ★ここにご自身のAPIキーを貼り付けてください★
 const isCanvasEnv = typeof __app_id !== 'undefined';
 const getModelText = (key) => key ? "gemini-3.5-flash-lite" : "gemini-2.5-flash-preview-09-2025";
 
@@ -37,8 +31,8 @@ try {
     } else {
         const getEnv = (name) => {
             try {
-                if (typeof process !== 'undefined' && process.env) {
-                    return process.env[name];
+                if (typeof import.meta !== 'undefined' && import.meta.env) {
+                    return import.meta.env[name];
                 }
             } catch (e) {}
             return undefined;
